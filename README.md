@@ -261,5 +261,5 @@ Setiap perubahan di masa depan **wajib** mengikuti aturan standardisasi berikut:
 
 - **Proyek:** NusaVision (Cognitive Domain Radar)
 - **Kompetisi:** Kartika Cyber Hackathon 2026
-- **Pengembang:** 4asec / Raffa Danendra (`raffadanendra2008@gmail.com`)
+- **Pengembang:** 4asec / Raffa Danendra (`raffadanendraagmail.com`)
 - **Lisensi:** MIT License © 2026 NusaVision Team. All rights reserved.
