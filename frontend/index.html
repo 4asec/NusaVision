@@ -1,0 +1,2224 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NusaVision // Cognitive Domain Radar</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    /* SATU FONT KONSISTEN DI SELURUH HALAMAN: 'Courier New', Courier, monospace */
+    * {
+      font-family: 'Courier New', Courier, monospace !important;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #040406;
+      color: #e6edf3;
+      margin: 0;
+      overflow-x: hidden;
+      selection-background-color: #ff2a2a;
+    }
+
+    ::selection {
+      background: #7f1d1d;
+      color: #ffffff;
+    }
+
+    /* Scrollbar minimalis bertema siber */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #040406;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1c1c24;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #ff2a2a;
+    }
+
+    /* Efek Glow & Shadow Siber */
+    .glow-red {
+      box-shadow: 0 0 20px rgba(255, 42, 42, 0.4);
+    }
+    .glow-red-sm {
+      box-shadow: 0 0 10px rgba(255, 42, 42, 0.25);
+    }
+    .glow-green {
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.35);
+    }
+
+    /* Canvas Latar Belakang Matrix Rain */
+    #matrixCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -2;
+      opacity: 0.18;
+      pointer-events: none;
+    }
+
+    /* Preloader Fullscreen */
+    #preloader {
+      position: fixed;
+      inset: 0;
+      background: #040406;
+      z-index: 99999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.5s ease;
+    }
+    #preloader.fade-out {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    /* Animasi Radar Pulse */
+    @keyframes radarSweep {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .animate-radar {
+      animation: radarSweep 8s linear infinite;
+    }
+
+    @keyframes pulseRing {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.05); opacity: 0.3; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .animate-pulse-ring {
+      animation: pulseRing 3s ease-in-out infinite;
+    }
+
+    /* Nav Drawer Transition */
+    #nav-drawer {
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Custom D3 Graph Node Transitions */
+    .node-highlight {
+      stroke: #38bdf8 !important;
+      stroke-width: 3.5px !important;
+      filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.8));
+    }
+    .node-dimmed {
+      opacity: 0.12 !important;
+    }
+    .link-dimmed {
+      stroke-opacity: 0.05 !important;
+    }
+    .link-highlight {
+      stroke: #ff2a2a !important;
+      stroke-opacity: 1 !important;
+      stroke-width: 2.2px !important;
+    }
+  </style>
+</head>
+<body class="bg-[#040406] text-neutral-200 antialiased relative">
+
+  <!-- ======================================================== -->
+  <!-- 1. PRELOADER SISTEM SIBER                              -->
+  <!-- ======================================================== -->
+  <div id="preloader">
+    <div class="w-80 md:w-96 text-center space-y-4 px-4">
+      <div class="flex items-center justify-center gap-2 mb-2">
+        <span class="w-3 h-3 bg-[#ff2a2a] rounded-sm animate-ping"></span>
+        <span class="text-xl md:text-2xl font-bold tracking-widest text-[#ff2a2a] drop-shadow-[0_0_12px_rgba(255,42,42,0.8)]">> NUSAVISION</span>
+      </div>
+      <div class="text-[11px] text-neutral-400 tracking-wider font-bold">
+        COGNITIVE DOMAIN DEFENSE RADAR
+      </div>
+      
+      <!-- Progress Bar Bertahap -->
+      <div class="w-full h-1.5 bg-[#1c1c24] rounded-full overflow-hidden p-0.5 border border-neutral-900">
+        <div id="preloader-bar" class="h-full bg-gradient-to-r from-red-800 to-[#ff2a2a] rounded-full transition-all duration-300 w-0 glow-red-sm"></div>
+      </div>
+      
+      <!-- Status Text Bertahap & Persentase -->
+      <div class="flex justify-between items-center text-[10px] text-neutral-400 font-mono">
+        <span id="preloader-status" class="truncate max-w-[260px]">Menginisialisasi sistem siber...</span>
+        <span id="preloader-pct" class="text-[#ff2a2a] font-bold">0%</span>
+      </div>
+      <div class="text-[9px] text-neutral-400 pt-2 border-t border-[#1c1c24]">
+        KARTIKA CYBER HACKATHON 2026 // KATEGORI SIBER SOSIAL
+      </div>
+    </div>
+  </div>
+
+  <!-- Background Matrix Rain Canvas -->
+  <canvas id="matrixCanvas"></canvas>
+
+  <!-- ======================================================== -->
+  <!-- STICKY NAVBAR ATAS (DENGAN INTERSECTION OBSERVER LOGO)   -->
+  <!-- ======================================================== -->
+  <header id="sticky-nav" class="fixed top-0 left-0 right-0 z-50 bg-[#040406]/90 backdrop-blur-md border-b border-[#1c1c24] px-4 md:px-8 py-3 transition-all duration-300">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      
+      <!-- Logo Kecil (Tersembunyi di awal, muncul via IntersectionObserver saat scroll lewat hero) -->
+      <a href="#hero-section" id="nav-mini-brand" class="flex items-center gap-2.5 opacity-0 -translate-x-4 pointer-events-none transition-all duration-500 ease-out group">
+        <div class="w-7 h-7 rounded border border-[#ff2a2a] bg-red-950/40 flex items-center justify-center text-[#ff2a2a] font-bold text-xs glow-red-sm group-hover:bg-red-900/60 transition">
+          NV
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="text-xs font-bold tracking-widest text-neutral-100 uppercase group-hover:text-[#ff2a2a] transition">NusaVision</span>
+            <span class="text-[9px] bg-red-950/80 text-red-400 border border-red-800 px-1 py-0.2 rounded font-mono">RADAR</span>
+          </div>
+          <div class="text-[9px] text-neutral-400 tracking-tighter">COGNITIVE DOMAIN // HACKATHON 2026</div>
+        </div>
+      </a>
+
+      <!-- Desktop Nav Quick Links -->
+      <nav class="hidden md:flex items-center gap-6 text-xs text-neutral-400">
+        <a href="#hero-section" class="nav-link hover:text-white transition tracking-wider flex items-center gap-1.5">
+          <span class="text-[#ff2a2a] text-[10px]">01.</span> Beranda
+        </a>
+        <a href="#sentiment-section" class="nav-link hover:text-white transition tracking-wider flex items-center gap-1.5">
+          <span class="text-[#ff2a2a] text-[10px]">02.</span> Sentimen & Radar
+        </a>
+        <a href="#sna-section" class="nav-link hover:text-white transition tracking-wider flex items-center gap-1.5">
+          <span class="text-[#ff2a2a] text-[10px]">03.</span> SNA & Satgas AI
+        </a>
+        <a href="#hoax-section" class="nav-link hover:text-white transition tracking-wider flex items-center gap-1.5">
+          <span class="text-[#ff2a2a] text-[10px]">04.</span> Hoax Classifier
+        </a>
+      </nav>
+
+      <!-- Right Header Actions (Status Pill + Hamburger Button SVG) -->
+      <div class="flex items-center gap-3">
+        <div class="hidden sm:flex items-center gap-2 bg-[#0e0e14] border border-[#1c1c24] px-2.5 py-1 rounded text-[10px]">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="text-neutral-300 font-bold">ONLINE</span>
+          <span class="text-neutral-400">|</span>
+          <span class="text-neutral-400 font-mono">PORT: 8080</span>
+        </div>
+
+        <!-- Tombol Hamburger Kanan (Custom Inline SVG, Tanpa Emoji) -->
+        <button id="btn-hamburger" onclick="toggleNavDrawer()" aria-label="Buka Menu Navigasi" class="w-9 h-9 flex items-center justify-center rounded bg-[#0e0e14] border border-[#1c1c24] hover:border-[#ff2a2a] text-neutral-300 hover:text-white transition glow-red-sm">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+          </svg>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Navigation Drawer (Slide-in dari Kanan) -->
+  <div id="nav-drawer-backdrop" onclick="toggleNavDrawer(false)" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 opacity-0 pointer-events-none transition-opacity duration-300"></div>
+  <aside id="nav-drawer" class="fixed top-0 right-0 w-80 max-w-full h-full bg-[#040406] border-l border-[#1c1c24] z-50 transform translate-x-full flex flex-col justify-between p-6 shadow-2xl">
+    <div>
+      <div class="flex items-center justify-between pb-4 border-b border-[#1c1c24] mb-6">
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 rounded bg-red-950/80 border border-[#ff2a2a] flex items-center justify-center text-xs font-bold text-[#ff2a2a]">NV</div>
+          <span class="text-xs font-bold uppercase tracking-wider text-neutral-200">Menu Operasi</span>
+        </div>
+        <!-- Close Button SVG -->
+        <button onclick="toggleNavDrawer(false)" aria-label="Tutup Menu" class="w-7 h-7 flex items-center justify-center rounded bg-[#0e0e14] border border-[#1c1c24] text-neutral-400 hover:text-white hover:border-[#ff2a2a] transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Links Navigasi Section -->
+      <nav class="space-y-3">
+        <a href="#hero-section" onclick="toggleNavDrawer(false)" class="group block p-3 rounded bg-[#0e0e14] border border-[#1c1c24] hover:border-[#ff2a2a] transition">
+          <div class="text-[10px] text-[#ff2a2a] font-bold">SECTION 01</div>
+          <div class="text-sm font-bold text-neutral-200 group-hover:text-white">Beranda & Radar Live</div>
+          <div class="text-[10px] text-neutral-400 mt-0.5">Overview ancaman & live carousel feed</div>
+        </a>
+        <a href="#sentiment-section" onclick="toggleNavDrawer(false)" class="group block p-3 rounded bg-[#0e0e14] border border-[#1c1c24] hover:border-[#ff2a2a] transition">
+          <div class="text-[10px] text-[#ff2a2a] font-bold">SECTION 02</div>
+          <div class="text-sm font-bold text-neutral-200 group-hover:text-white">Sentimen & Early Warning</div>
+          <div class="text-[10px] text-neutral-400 mt-0.5">Tren multi-series & anomali lonjakan</div>
+        </a>
+        <a href="#sna-section" onclick="toggleNavDrawer(false)" class="group block p-3 rounded bg-[#0e0e14] border border-[#1c1c24] hover:border-[#ff2a2a] transition">
+          <div class="text-[10px] text-[#ff2a2a] font-bold">SECTION 03</div>
+          <div class="text-sm font-bold text-neutral-200 group-hover:text-white">Social Network Analysis</div>
+          <div class="text-[10px] text-neutral-400 mt-0.5">Graf rimbun, dalang sentral, satgas AI</div>
+        </a>
+        <a href="#hoax-section" onclick="toggleNavDrawer(false)" class="group block p-3 rounded bg-[#0e0e14] border border-[#1c1c24] hover:border-[#ff2a2a] transition">
+          <div class="text-[10px] text-[#ff2a2a] font-bold">SECTION 04</div>
+          <div class="text-sm font-bold text-neutral-200 group-hover:text-white">Hoax Classifier & RAG Lab</div>
+          <div class="text-[10px] text-neutral-400 mt-0.5">Verifikasi fakta silang & DeepSeek R1</div>
+        </a>
+      </nav>
+    </div>
+
+    <!-- Info Status Sistem Bawah Drawer -->
+    <div class="border-t border-[#1c1c24] pt-4 space-y-2 text-[10px]">
+      <div class="flex justify-between text-neutral-400">
+        <span>Reasoning Engine:</span>
+        <span class="text-neutral-200 font-bold">DeepSeek-R1:8b</span>
+      </div>
+      <div class="flex justify-between text-neutral-400">
+        <span>Satgas AI Divisi:</span>
+        <span class="text-[#ff2a2a] font-bold">5 Agen Aktif</span>
+      </div>
+      <div class="flex justify-between text-neutral-400">
+        <span>Status Protokol:</span>
+        <span class="text-emerald-400 font-bold">SIAGA PENUH</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ======================================================== -->
+  <!-- 2. HERO / BERANDA (#hero-section)                         -->
+  <!-- ======================================================== -->
+  <section id="hero-section" class="pt-28 pb-16 px-4 md:px-8 max-w-7xl mx-auto min-h-[92vh] flex flex-col justify-center">
+    
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+      
+      <!-- SISI KIRI: CAROUSEL DENGAN EFEK CARD BERTUMPUK (3D LAYER DEPTH) -->
+      <div class="lg:col-span-7 space-y-5">
+        
+        <div class="inline-flex items-center gap-2 text-[10px] font-bold uppercase bg-red-950/50 text-red-400 border border-red-900/80 px-2.5 py-1 rounded">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#ff2a2a] animate-ping"></span>
+          <span>Radar Pengawasan Siber Sosial</span>
+        </div>
+
+        <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-wide leading-tight uppercase">
+          Pemantau Real-Time Ancaman Kognitif & Polarisasi Opini
+        </h1>
+
+        <p class="text-xs md:text-sm text-neutral-400 leading-relaxed">
+          Platform intelijen siber sosial otonom untuk mendeteksi disinformasi, propaganda komputasional, jaringan buzzer botnet, dan eskalasi isu publik menggunakan integrasi Multi-Agent AI dan DeepSeek-R1.
+        </p>
+
+        <!-- CONTAINER CAROUSEL OTOMATIS DENGAN KEDALAMAN KARTU BERTUMPUK -->
+        <div class="relative pt-4 pb-2" id="hero-carousel-wrapper">
+          
+          <!-- Layer Kartu Bertumpuk 2 (Offset paling belakang, opacity redup) -->
+          <div class="absolute inset-0 translate-x-4 translate-y-6 bg-[#0e0e14] border border-[#1c1c24] rounded-lg opacity-25 pointer-events-none transition-all duration-500"></div>
+          
+          <!-- Layer Kartu Bertumpuk 1 (Offset tengah) -->
+          <div class="absolute inset-0 translate-x-2 translate-y-3 bg-[#0e0e14] border border-[#1c1c24] rounded-lg opacity-50 pointer-events-none transition-all duration-500"></div>
+
+          <!-- KARTU AKTIF CAROUSEL UTAMA -->
+          <div id="carousel-card-active" class="relative z-10 bg-[#0e0e14] border border-[#1c1c24] hover:border-red-900/80 rounded-lg p-5 shadow-2xl transition-all duration-500 overflow-hidden min-h-[220px]">
+            
+            <!-- Slide A: Card Feed Isu Viral Real-Time (data /api/live-trends) -->
+            <div id="slide-feed" class="carousel-slide transition-opacity duration-500 block">
+              <div class="flex items-center justify-between text-[10px] border-b border-[#1c1c24] pb-2.5 mb-3">
+                <span class="text-red-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-[#ff2a2a] animate-pulse"></span>
+                  Feed Isu Viral Real-Time
+                </span>
+                <span id="slide-source" class="text-neutral-400 font-mono">Google News RSS // Nasional</span>
+              </div>
+              <div class="space-y-2">
+                <div class="flex items-center gap-2">
+                  <span id="slide-hashtag" class="text-sm md:text-base font-bold text-[#ff2a2a] font-mono tracking-tight">#PilkadaSerentak2024</span>
+                  <span id="slide-sentiment-badge" class="text-[9px] bg-red-950 text-red-300 border border-red-800 px-2 py-0.5 rounded font-mono font-bold">
+                    POLARISASI TERDETEKSI
+                  </span>
+                </div>
+                <p id="slide-headline" class="text-xs text-neutral-300 leading-normal line-clamp-2">
+                  Menghubungkan ke aliran transmisi data berita dan opini publik terkini di Indonesia...
+                </p>
+                <div class="flex items-center justify-between text-[10px] text-neutral-400 pt-3 border-t border-[#1c1c24]">
+                  <span id="slide-timestamp" class="font-mono">Waktu Terbit: Hari Ini</span>
+                  <button id="slide-action-btn" onclick="investigateTarget(currentSlideTarget)" class="inline-flex items-center gap-1.5 text-xs text-[#ff2a2a] hover:text-white font-bold transition">
+                    <span>Investigasi di SNA</span>
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Slide B: Card Animasi Dekoratif "Social Network Scan" (Canvas Particle Murni Visual) -->
+            <div id="slide-scanner" class="carousel-slide transition-opacity duration-500 hidden">
+              <div class="flex items-center justify-between text-[10px] border-b border-[#1c1c24] pb-2 mb-2">
+                <span class="text-red-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                  Social Network Particle Scan
+                </span>
+                <span class="text-neutral-400 font-mono">HUD // 2.4 GHz FREQ SWEEP</span>
+              </div>
+              <div class="relative w-full h-32 bg-black/90 rounded border border-[#1c1c24] overflow-hidden flex items-center justify-center">
+                <canvas id="particleCanvas" class="w-full h-full absolute inset-0"></canvas>
+                <div class="absolute top-2 left-2 text-[9px] text-neutral-400 font-mono pointer-events-none">
+                  COORDINATE: 106.8456° E, 6.2088° S<br>
+                  SCAN STATUS: SWEEPING ANOMALY
+                </div>
+                <div class="absolute bottom-2 right-2 text-[9px] text-[#ff2a2a] font-mono pointer-events-none flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#ff2a2a] animate-pulse"></span>
+                  RADAR BEAM ACTIVE
+                </div>
+              </div>
+              <div class="mt-2 text-[10px] text-neutral-400 flex justify-between items-center">
+                <span>Topologi visual simpul siber yang saling terafiliasi</span>
+                <span class="text-neutral-300 font-mono">32 Simpul Terdeteksi</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Carousel Controls: Dot Indikator & Tombol Prev/Next -->
+          <div class="flex items-center justify-between mt-3 px-1">
+            <div class="flex items-center gap-2">
+              <button onclick="setCarouselSlide(0)" id="dot-slide-0" aria-label="Slide 1 Feed" class="w-7 h-1.5 rounded-full bg-[#ff2a2a] transition-all"></button>
+              <button onclick="setCarouselSlide(1)" id="dot-slide-1" aria-label="Slide 2 Radar" class="w-2 h-1.5 rounded-full bg-neutral-700 hover:bg-neutral-500 transition-all"></button>
+            </div>
+            <div class="text-[10px] text-neutral-400 font-mono">
+              <span id="carousel-timer-text">AUTO-ROTATE: AKTIF</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Tombol Aksi Cepat Hero -->
+        <div class="pt-2 flex flex-wrap gap-3">
+          <a href="#sentiment-section" class="bg-red-950/80 hover:bg-red-900 border border-[#ff2a2a] text-white text-xs font-bold px-5 py-2.5 rounded uppercase tracking-wider transition glow-red flex items-center gap-2">
+            <span>Buka Dashboard Sentimen</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+            </svg>
+          </a>
+          <a href="#sna-section" class="bg-[#0e0e14] hover:bg-neutral-900 border border-[#1c1c24] hover:border-neutral-700 text-neutral-300 text-xs font-bold px-5 py-2.5 rounded uppercase tracking-wider transition flex items-center gap-2">
+            <span>Luncurkan Satgas AI</span>
+          </a>
+        </div>
+
+      </div>
+
+      <!-- SISI KANAN: LOGO BESAR NV + SUBTITLE "COGNITIVE DOMAIN RADAR" -->
+      <div class="lg:col-span-5 flex justify-center">
+        <div class="w-full max-w-sm border border-[#1c1c24] bg-gradient-to-b from-[#0e0e14] to-[#040406] p-7 rounded-xl shadow-2xl relative overflow-hidden text-center group">
+          
+          <!-- Background Radar Sweep Circle Dekoratif -->
+          <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
+            <div class="w-72 h-72 border border-red-700/60 rounded-full animate-pulse-ring"></div>
+            <div class="w-48 h-48 border border-red-600/40 rounded-full absolute"></div>
+            <div class="w-24 h-24 border border-red-500/30 rounded-full absolute"></div>
+            <div class="w-72 h-0.5 bg-gradient-to-r from-transparent via-[#ff2a2a] to-transparent absolute animate-radar"></div>
+          </div>
+
+          <!-- Emblem Besar NV -->
+          <div class="relative z-10">
+            <div class="w-20 h-20 mx-auto rounded-xl border-2 border-[#ff2a2a] bg-black/80 flex items-center justify-center text-3xl font-black text-[#ff2a2a] drop-shadow-[0_0_15px_rgba(255,42,42,0.9)] mb-4 glow-red">
+              NV
+            </div>
+
+            <h2 class="text-xl font-black text-white tracking-widest uppercase">
+              NUSAVISION
+            </h2>
+
+            <div class="text-xs font-bold text-[#ff2a2a] tracking-widest uppercase mt-1">
+              COGNITIVE DOMAIN RADAR
+            </div>
+
+            <div class="text-[10px] text-neutral-400 mt-3 border-t border-[#1c1c24] pt-3 leading-relaxed">
+              Sistem Pertahanan Siber Sosial Mandiri Berbasis Hierarki Multi-Agent Otonom & Model Reasoning Komputasional
+            </div>
+
+            <!-- Kartika Cyber Hackathon Info Badge -->
+            <div class="mt-4 pt-3 border-t border-[#1c1c24] flex items-center justify-between text-[9px] text-neutral-400 font-mono">
+              <span>HACKATHON</span>
+              <span class="text-neutral-300 font-bold">KARTIKA 2026</span>
+            </div>
+            <div class="flex items-center justify-between text-[9px] text-neutral-400 font-mono mt-1">
+              <span>KATEGORI</span>
+              <span class="text-red-400 font-bold">SIBER SOSIAL</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- ======================================================== -->
+  <!-- 3. DASHBOARD SENTIMEN & EARLY WARNING ISU VIRAL          -->
+  <!-- ======================================================== -->
+  <section id="sentiment-section" class="py-16 px-4 md:px-8 max-w-7xl mx-auto border-t border-[#1c1c24]">
+    
+    <!-- Section Title -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+      <div>
+        <div class="text-[10px] text-[#ff2a2a] font-bold uppercase tracking-widest mb-1">
+          // SECTION 02
+        </div>
+        <h2 class="text-xl md:text-2xl font-black text-white uppercase tracking-wider">
+          Dashboard Sentimen & Early Warning Isu Viral
+        </h2>
+        <p class="text-xs text-neutral-400 mt-1">
+          Analisis polaritas emosi publik dan radar deteksi lonjakan anomali narasi terorkestrasi lintas platform
+        </p>
+      </div>
+
+      <!-- Tab Rentang Waktu: Harian / Mingguan / Bulanan / Tahunan -->
+      <div class="inline-flex p-1 bg-[#0e0e14] border border-[#1c1c24] rounded-lg">
+        <button onclick="changeTimeRange('harian')" id="btn-range-harian" class="range-btn px-3 py-1.5 rounded text-xs font-bold transition bg-red-950 text-red-300 border border-red-800 glow-red-sm">
+          Harian
+        </button>
+        <button onclick="changeTimeRange('mingguan')" id="btn-range-mingguan" class="range-btn px-3 py-1.5 rounded text-xs font-bold transition text-neutral-400 hover:text-white">
+          Mingguan
+        </button>
+        <button onclick="changeTimeRange('bulanan')" id="btn-range-bulanan" class="range-btn px-3 py-1.5 rounded text-xs font-bold transition text-neutral-400 hover:text-white">
+          Bulanan
+        </button>
+        <button onclick="changeTimeRange('tahunan')" id="btn-range-tahunan" class="range-btn px-3 py-1.5 rounded text-xs font-bold transition text-neutral-400 hover:text-white">
+          Tahunan
+        </button>
+      </div>
+    </div>
+
+    <!-- Summary Metrics Row -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div class="bg-[#0e0e14] border border-[#1c1c24] p-3.5 rounded-lg">
+        <div class="text-[10px] text-neutral-400 uppercase">Indeks Polarisasi</div>
+        <div id="stat-polarization" class="text-base font-extrabold text-[#ff2a2a] mt-0.5">74.8% (TINGGI)</div>
+        <div class="text-[9px] text-neutral-400 mt-1">Risiko polarisasi opini publik</div>
+      </div>
+      <div class="bg-[#0e0e14] border border-[#1c1c24] p-3.5 rounded-lg">
+        <div class="text-[10px] text-neutral-400 uppercase">Sentimen Dominan</div>
+        <div id="stat-dominant" class="text-base font-extrabold text-amber-400 mt-0.5">Negatif (Provokatif)</div>
+        <div class="text-[9px] text-neutral-400 mt-1">Didorong isu finansial & bansos</div>
+      </div>
+      <div class="bg-[#0e0e14] border border-[#1c1c24] p-3.5 rounded-lg">
+        <div class="text-[10px] text-neutral-400 uppercase">Volume Percakapan</div>
+        <div id="stat-volume" class="text-base font-extrabold text-neutral-100 mt-0.5">348.2K Transmisi</div>
+        <div class="text-[9px] text-neutral-400 mt-1">Rentang waktu terpilih</div>
+      </div>
+      <div class="bg-[#0e0e14] border border-[#1c1c24] p-3.5 rounded-lg">
+        <div class="text-[10px] text-neutral-400 uppercase">Deteksi Lonjakan Agen 1</div>
+        <div id="stat-surge" class="text-base font-extrabold text-[#ff2a2a] mt-0.5">3 Terorkestrasi</div>
+        <div class="text-[9px] text-neutral-400 mt-1">Dari total 5 isu aktif</div>
+      </div>
+    </div>
+
+    <!-- LAYOUT 2 KOLOM DALAM SECTION YANG SAMA -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      
+      <!-- KOLOM KIRI (±60% Lebar): GRAFIK GARIS MULTI-SERIES -->
+      <div class="lg:col-span-7 bg-[#0e0e14] border border-[#1c1c24] p-5 rounded-lg space-y-4">
+        
+        <div class="flex items-center justify-between border-b border-[#1c1c24] pb-3">
+          <div>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-neutral-200">
+              Dinamika Sentimen Publik Sepanjang Waktu
+            </h3>
+            <p class="text-[10px] text-neutral-400">Multi-series: Positif (Hijau), Negatif (Merah), Netral (Abu-abu)</p>
+          </div>
+          <div class="flex items-center gap-3 text-[10px]">
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Positif</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#ff2a2a]"></span> Negatif</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span> Netral</span>
+          </div>
+        </div>
+
+        <!-- Canvas Chart.js -->
+        <div class="w-full h-72 md:h-80 relative">
+          <canvas id="sentimentChart"></canvas>
+        </div>
+
+        <div class="flex items-center justify-between text-[10px] text-neutral-400 border-t border-[#1c1c24] pt-2.5 font-mono">
+          <span>Algoritma: Dual-Polarity VADER & DeepSeek Reasoning</span>
+          <span id="chart-range-label">Rentang: 24 Jam Terakhir</span>
+        </div>
+
+      </div>
+
+      <!-- KOLOM KANAN (±40% Lebar): PANEL "EARLY WARNING ISU VIRAL" -->
+      <div class="lg:col-span-5 bg-[#0e0e14] border border-[#1c1c24] p-5 rounded-lg space-y-4">
+        
+        <div class="flex items-center justify-between border-b border-[#1c1c24] pb-3">
+          <div>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-neutral-200 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-[#ff2a2a] animate-ping"></span>
+              Early Warning Isu Viral
+            </h3>
+            <p class="text-[10px] text-neutral-400">Evaluasi anomali kecepatan transmisi oleh Agen 1</p>
+          </div>
+          <span class="text-[10px] bg-red-950/80 text-red-400 border border-red-800 px-1.5 py-0.5 rounded font-mono">
+            LIVE MONITOR
+          </span>
+        </div>
+
+        <!-- List Isu dengan Dot Status: Natural (Hijau) vs Terorkestrasi (Merah) -->
+        <div id="early-warning-list" class="space-y-2.5 max-h-[340px] overflow-y-auto pr-1">
+          <!-- Diisi otomatis oleh JavaScript -->
+          <div class="text-xs text-neutral-400 py-4 text-center">Memuat daftar early warning...</div>
+        </div>
+
+        <div class="text-[10px] text-neutral-400 border-t border-[#1c1c24] pt-2 flex items-center justify-between">
+          <span class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Alami (Organik)
+          </span>
+          <span class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-[#ff2a2a] animate-pulse"></span> Terorkestrasi (Buzzer)
+          </span>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- GRID CARD HASHTAG TRENDING (DI BAWAH GRAFIK) -->
+    <div class="mt-8">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-neutral-300">
+          Hashtag Trending & Arah Sentimen Lintas Platform
+        </h3>
+        <span class="text-[10px] text-neutral-400 font-mono">Pembaruan: Real-Time Stream</span>
+      </div>
+
+      <div id="hashtag-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Diisi otomatis oleh JS -->
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ======================================================== -->
+  <!-- 4. SOCIAL NETWORK ANALYSIS (SNA) (#sna-section)          -->
+  <!-- ======================================================== -->
+  <section id="sna-section" class="py-16 px-4 md:px-8 max-w-7xl mx-auto border-t border-[#1c1c24]">
+    
+    <!-- Section Title -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-4">
+      <div>
+        <div class="text-[10px] text-[#ff2a2a] font-bold uppercase tracking-widest mb-1">
+          // SECTION 03
+        </div>
+        <h2 class="text-xl md:text-2xl font-black text-white uppercase tracking-wider">
+          Social Network Analysis & Satgas Multi-Agent
+        </h2>
+        <p class="text-xs text-neutral-400 mt-1">
+          Pemetaan graf rimbun force-directed, penguncian simpul dalang utama, dan investigasi multi-hop
+        </p>
+      </div>
+
+      <!-- Status Satgas AI -->
+      <div class="flex items-center gap-2 text-xs bg-[#0e0e14] border border-[#1c1c24] px-3 py-1.5 rounded">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span class="text-neutral-300 font-bold">5 AGEN SATGAS: ONLINE</span>
+      </div>
+    </div>
+
+    <!-- Top Input Target & Tombol Eksekusi Satgas -->
+    <div class="bg-[#0e0e14] border border-[#1c1c24] p-4 rounded-lg mb-6 backdrop-blur">
+      <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        <div class="flex-1 flex items-center gap-3">
+          <span class="text-xs text-neutral-400 uppercase font-bold shrink-0">Sasaran Operasi:</span>
+          <div class="relative flex-1">
+            <input id="inputTopik" type="text" value="#PilkadaSerentak2024" placeholder="Ketik topik sasaran, tagar, atau entitas target..." class="w-full bg-black border border-[#1c1c24] focus:border-[#ff2a2a] px-3.5 py-2 rounded text-xs text-neutral-200 focus:outline-none font-mono">
+          </div>
+        </div>
+        <button onclick="startInvestigation()" class="bg-red-950 hover:bg-red-900 border border-[#ff2a2a] text-white font-bold text-xs px-6 py-2 rounded uppercase tracking-wider transition glow-red shrink-0 flex items-center justify-center gap-2">
+          <span>Luncurkan Satgas Siber</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- KARTU HIERARKI MULTI-AGENT (BOSS AI -> ANALIS 1 -> ANALIS 2 -> OPERATOR 3 -> AUDITOR 4) -->
+      <div class="mt-4 pt-3 border-t border-[#1c1c24]">
+        <div class="text-[10px] text-neutral-400 uppercase tracking-widest mb-2 flex items-center justify-between">
+          <span>// Alur Komando Satgas Multi-Agent (AI Office)</span>
+          <span id="agent-active-counter" class="text-[#ff2a2a]">MENUNGGU PERINTAH</span>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 text-center">
+          <div id="card-boss" class="border border-[#1c1c24] bg-black/40 p-2 rounded transition-all">
+            <div class="text-[9px] text-neutral-400">KOMANDAN</div>
+            <div class="text-xs font-bold text-neutral-200">Boss AI</div>
+            <div id="status-boss" class="text-[9px] text-neutral-400 mt-1 font-mono">STANDBY</div>
+          </div>
+          <div id="card-agent_1" class="border border-[#1c1c24] bg-black/40 p-2 rounded transition-all">
+            <div class="text-[9px] text-neutral-400">ANALIS 01</div>
+            <div class="text-xs font-bold text-neutral-200">Early Warning</div>
+            <div id="status-agent_1" class="text-[9px] text-neutral-400 mt-1 font-mono">STANDBY</div>
+          </div>
+          <div id="card-agent_2" class="border border-[#1c1c24] bg-black/40 p-2 rounded transition-all">
+            <div class="text-[9px] text-neutral-400">ANALIS 02</div>
+            <div class="text-xs font-bold text-neutral-200">DeepSeek Reasoner</div>
+            <div id="status-agent_2" class="text-[9px] text-neutral-400 mt-1 font-mono">STANDBY</div>
+          </div>
+          <div id="card-agent_3" class="border border-[#1c1c24] bg-black/40 p-2 rounded transition-all">
+            <div class="text-[9px] text-neutral-400">OPERATOR 03</div>
+            <div class="text-xs font-bold text-neutral-200">BotRadar & SNA</div>
+            <div id="status-agent_3" class="text-[9px] text-neutral-400 mt-1 font-mono">STANDBY</div>
+          </div>
+          <div id="card-agent_4" class="border border-[#1c1c24] bg-black/40 p-2 rounded transition-all col-span-2 sm:col-span-1">
+            <div class="text-[9px] text-neutral-400">AUDITOR 04</div>
+            <div class="text-xs font-bold text-neutral-200">Forensic PoC</div>
+            <div id="status-agent_4" class="text-[9px] text-neutral-400 mt-1 font-mono">STANDBY</div>
+          </div>
+        </div>
+
+        <!-- Terminal Log Bar Real-Time SSE -->
+        <div class="mt-3 bg-black border border-[#1c1c24] p-2.5 rounded flex items-center gap-2">
+          <span class="text-[#ff2a2a] text-xs font-bold shrink-0">></span>
+          <div id="office-log" class="text-[11px] text-neutral-300 font-mono truncate flex-1">
+            Sistem radar siaga. Tentukan target operasi dan klik 'Luncurkan Satgas Siber'.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- MAIN SNA WORKSPACE: GRAF D3.JS (KIRI) & PANEL PROFIL INTELIJEN (KANAN) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      
+      <!-- KOLOM KIRI (8 Kolom): GRAF D3 FORCE-DIRECTED DENGAN SEARCH BOX MULTI-HOP -->
+      <div class="lg:col-span-8 bg-[#0e0e14] border border-[#1c1c24] p-4 md:p-5 rounded-lg space-y-4">
+        
+        <!-- Header Graf & Search Box dengan Ikon Kaca Pembesar SVG Custom -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-[#ff2a2a] animate-pulse"></span>
+            <div>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-neutral-200">
+                Topologi Jaringan Siber (Force-Directed D3.js)
+              </h3>
+              <p class="text-[10px] text-neutral-400">Klik node untuk bedah data akun; seret untuk simulasi fisik</p>
+            </div>
+          </div>
+
+          <!-- SEARCH BOX DENGAN IKON KACA PEMBESAR SVG CUSTOM (BUKAN EMOJI) -->
+          <div class="relative w-full sm:w-64">
+            <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-neutral-400">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+              </svg>
+            </div>
+            <input id="sna-search-input" oninput="handleSNASearch(this.value)" type="text" placeholder="Cari username / multi-hop..." class="w-full bg-black border border-[#1c1c24] focus:border-[#ff2a2a] pl-8 pr-7 py-1.5 rounded text-xs text-neutral-200 focus:outline-none font-mono">
+            <button onclick="clearSNASearch()" id="btn-clear-search" aria-label="Reset Pencarian" class="absolute inset-y-0 right-0 pr-2.5 flex items-center text-neutral-400 hover:text-white hidden">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Toolbar Kontrol Graf (Zoom In, Zoom Out, Reset Center) & Legend -->
+        <div class="flex flex-wrap items-center justify-between text-[10px] text-neutral-400 pt-2 border-t border-[#1c1c24] gap-2">
+          <div class="flex items-center gap-3">
+            <span class="flex items-center gap-1.5">
+              <span class="w-3 h-3 rounded-full bg-[#ff0000] border border-white"></span>
+              <span class="font-bold text-white">Dalang Utama</span>
+            </span>
+            <span class="flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#ef4444]"></span>
+              <span>Botnet / Satelit</span>
+            </span>
+            <span class="flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+              <span>Akun Organik</span>
+            </span>
+          </div>
+
+          <div class="flex items-center gap-1.5">
+            <button onclick="resetGraphZoom()" class="bg-black border border-[#1c1c24] hover:border-neutral-600 px-2 py-0.5 rounded text-[10px] font-mono text-neutral-300">
+              Reset View
+            </button>
+            <span id="search-status-badge" class="text-neutral-400 font-mono text-[9px]"></span>
+          </div>
+        </div>
+
+        <!-- CANVAS / SVG CONTAINER GRAF D3.JS -->
+        <div id="sna-graph-box" class="w-full h-96 sm:h-[420px] bg-black rounded border border-[#1c1c24] relative overflow-hidden flex items-center justify-center">
+          <span class="text-xs text-neutral-400">Memuat topologi klaster siber...</span>
+        </div>
+
+        <!-- AVATAR ROW AKUN TERAFILIASI (FOTO/BADGE PROFIL ASLI PLATFORM) -->
+        <div class="border-t border-[#1c1c24] pt-3">
+          <div class="flex items-center justify-between mb-2 text-[10px]">
+            <span class="text-neutral-400 uppercase font-bold">Simpul Utama Terafiliasi (Klik untuk Sorot Relasi):</span>
+            <span class="text-neutral-400 font-mono" id="avatar-count-label">0 Akun Terpilih</span>
+          </div>
+          <div id="affiliated-avatar-row" class="flex items-center gap-2 overflow-x-auto pb-1.5 scrollbar-thin">
+            <!-- Diisi dinamis oleh JavaScript -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- KOLOM KANAN (4 Kolom): PANEL PROFIL INTELIJEN & CATATAN PERINGATAN AI -->
+      <div class="lg:col-span-4 bg-[#0e0e14] border border-[#1c1c24] p-4 md:p-5 rounded-lg space-y-4">
+        
+        <div>
+          <h3 class="text-xs font-bold text-neutral-200 uppercase tracking-wider mb-2 flex items-center justify-between">
+            <span>Profil Intelijen Node</span>
+            <span id="target-lbl-sub" class="text-[9px] text-[#ff2a2a] font-mono">TARGET: -</span>
+          </h3>
+
+          <!-- Kartu Profil Dinamis (Klik Node / Avatar) -->
+          <div id="profile-card" class="bg-black border border-[#1c1c24] p-3.5 rounded-lg space-y-3 text-xs">
+            <div class="text-neutral-400 italic text-[11px] py-4 text-center">
+              Pilih salah satu lingkaran node pada graf SNA atau avatar di samping untuk membedah data akun secara mendalam.
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL CATATAN PERINGATAN OTOMATIS DARI AI (DENGAN IKON WARNING SVG CUSTOM, TANPA EMOJI) -->
+        <div id="ai-warning-panel" class="bg-red-950/20 border border-red-900/60 p-3.5 rounded-lg space-y-2 hidden">
+          <div class="flex items-center gap-2 text-[#ff2a2a] font-bold text-xs uppercase tracking-wide">
+            <!-- Custom Inline SVG Warning Triangle (No Emoji) -->
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+            </svg>
+            <span>Catatan Peringatan AI</span>
+          </div>
+          <p id="ai-warning-text" class="text-[11px] text-neutral-300 leading-relaxed font-mono">
+            Node ini terdeteksi memiliki relasi intensif ke simpul dalang utama dan terindikasi sebagai bagian dari operasi amplifikasi botnet.
+          </p>
+        </div>
+
+        <!-- Bagian Ringkasan PoC Resmi & Tombol Ekspor -->
+        <div class="border-t border-[#1c1c24] pt-3 space-y-2.5">
+          <div class="text-[10px] text-neutral-400 font-bold uppercase">KESIMPULAN AUDIT POC:</div>
+          <div id="poc-summary-box" class="text-[11px] text-neutral-300 bg-black/60 p-2.5 rounded border border-[#1c1c24] leading-relaxed italic">
+            Satgas belum menjalankan investigasi penuh untuk sasaran ini.
+          </div>
+          
+          <div class="flex justify-between items-center text-xs">
+            <span class="text-[10px] text-neutral-400 font-mono">STATUS ESKALASI:</span>
+            <span id="poc-threat-badge" class="font-extrabold text-neutral-400 font-mono">STANDBY</span>
+          </div>
+
+          <!-- Tombol Ekspor PoC Resmi (JSON & MD) -->
+          <div class="pt-2 flex gap-2">
+            <button id="btn-export-json" onclick="exportPoC('json')" disabled class="flex-1 bg-[#0e0e14] border border-[#1c1c24] hover:border-[#ff2a2a] text-[10px] font-bold text-neutral-400 hover:text-white py-2 px-2 rounded uppercase tracking-wider transition disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-1.5">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+              </svg>
+              <span>PoC (JSON)</span>
+            </button>
+            <button id="btn-export-md" onclick="exportPoC('markdown')" disabled class="flex-1 bg-red-950/70 border border-red-800 hover:bg-red-900 text-[10px] font-bold text-red-300 hover:text-white py-2 px-2 rounded uppercase tracking-wider transition disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-1.5">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+              </svg>
+              <span>Dossier (MD)</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- ======================================================== -->
+  <!-- 5. HOAX CLASSIFIER (#hoax-section)                       -->
+  <!-- ======================================================== -->
+  <section id="hoax-section" class="py-16 px-4 md:px-8 max-w-7xl mx-auto border-t border-[#1c1c24]">
+    
+    <!-- Section Title -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+      <div>
+        <div class="text-[10px] text-[#ff2a2a] font-bold uppercase tracking-widest mb-1">
+          // SECTION 04
+        </div>
+        <h2 class="text-xl md:text-2xl font-black text-white uppercase tracking-wider">
+          Dual-Mode Hoax Classifier & RAG Fact Lab
+        </h2>
+        <p class="text-xs text-neutral-400 mt-1">
+          Analisis komparatif isu viral lintas platform terkini dan verifikasi forensik berbasis DeepSeek-R1
+        </p>
+      </div>
+
+      <div class="text-[10px] text-neutral-400 font-mono bg-[#0e0e14] border border-[#1c1c24] px-3 py-1.5 rounded">
+        REPOSITORI: TURNBACKHOAX // CEKFAKTA // KOMINFO
+      </div>
+    </div>
+
+    <!-- MAIN 2-COLUMN LAYOUT HOAX CLASSIFIER -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      
+      <!-- KOLOM KIRI (7 Kolom): LIST TRENDING BERITA HOAX LINTAS PLATFORM TERKINI -->
+      <div class="lg:col-span-7 space-y-4">
+        
+        <div class="flex items-center justify-between border-b border-[#1c1c24] pb-2.5">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-neutral-200 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-[#ff2a2a] animate-pulse"></span>
+            Isu Disinformasi Viral Terkini (Lintas Platform)
+          </h3>
+          <span class="text-[10px] text-neutral-400 font-mono">Klik kartu untuk detail forensik</span>
+        </div>
+
+        <!-- Kontainer Kartu Hoaks Viral -->
+        <div id="hoax-cards-container" class="space-y-3">
+          <!-- Diisi dinamis oleh JavaScript -->
+          <div class="text-xs text-neutral-400 py-6 text-center">Memuat feed disinformasi terkini...</div>
+        </div>
+
+        <!-- DUAL-MODE INTERACTIVE TESTER: UJI KLAIM KUSTOM SECARA LANGSUNG -->
+        <div class="mt-8 bg-[#0e0e14] border border-[#1c1c24] p-5 rounded-lg space-y-3">
+          <div class="flex items-center justify-between border-b border-[#1c1c24] pb-2">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-neutral-200">
+              Uji Cepat Klaim Kustom (Mode Forensik RAG Bebas)
+            </h4>
+            <span class="text-[9px] bg-red-950 text-red-300 border border-red-800 px-1.5 py-0.2 rounded font-mono">
+              DEEPSEEK REASONING
+            </span>
+          </div>
+          <p class="text-[11px] text-neutral-400">
+            Ketik teks klaim, pesan berantai, atau narasi berita yang beredar untuk diverifikasi silang ke web rujukan:
+          </p>
+          <textarea id="hoax-custom-input" rows="3" placeholder="Contoh: Beredar kabar pemerintah membagikan uang tunai 10 juta via link telegram..." class="w-full bg-black border border-[#1c1c24] focus:border-[#ff2a2a] p-3 rounded text-xs text-neutral-200 focus:outline-none font-mono"></textarea>
+          
+          <div class="flex justify-between items-center">
+            <button onclick="runCustomFactCheck()" id="btn-custom-check" class="bg-red-950 hover:bg-red-900 border border-[#ff2a2a] text-white font-bold text-xs px-5 py-2 rounded uppercase tracking-wider transition glow-red flex items-center gap-2">
+              <span>Verifikasi Fakta Sekarang</span>
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+              </svg>
+            </button>
+            <span id="custom-check-status" class="text-[10px] text-neutral-400 font-mono"></span>
+          </div>
+
+          <!-- Hasil Uji Klaim Kustom -->
+          <div id="custom-fact-result" class="mt-3 p-3.5 bg-black rounded border border-[#1c1c24] text-xs space-y-2 hidden">
+            <!-- Diisi oleh JS -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- KOLOM KANAN (5 Kolom): PANEL DETAIL KANAN (BREAKDOWN SKOR & SUMBER RUJUKAN) -->
+      <div class="lg:col-span-5 bg-[#0e0e14] border border-[#1c1c24] p-5 rounded-lg space-y-5 sticky top-20">
+        
+        <div>
+          <div class="text-[10px] text-neutral-400 uppercase font-bold tracking-wider mb-1 flex items-center justify-between">
+            <span>Bedah Forensik Berita Terpilih</span>
+            <span id="detail-hoax-id" class="text-[#ff2a2a] font-mono">HOAX-2026-001</span>
+          </div>
+          <h3 id="detail-hoax-title" class="text-sm font-bold text-white leading-snug">
+            Beredar Kabar Pembagian Bantuan Tunai 10 Juta via Link Telegram
+          </h3>
+          <div class="flex items-center gap-2 mt-2">
+            <span id="detail-platform-badge" class="text-[9px] bg-neutral-900 text-neutral-300 border border-[#1c1c24] px-2 py-0.5 rounded font-mono">
+              Telegram / WhatsApp
+            </span>
+            <span id="detail-date" class="text-[10px] text-neutral-400 font-mono">
+              Hari Ini, 14:20 WIB
+            </span>
+          </div>
+        </div>
+
+        <!-- RINGKASAN FAKTA HASIL RAG FACT-CHECK -->
+        <div class="space-y-1.5">
+          <div class="text-[10px] text-neutral-400 uppercase font-bold tracking-wider">
+            Ringkasan Hasil RAG Fact-Check:
+          </div>
+          <div id="detail-fact-summary" class="text-xs text-neutral-300 leading-relaxed bg-black/70 p-3 rounded border border-[#1c1c24] font-mono">
+            Kementerian Keuangan, Kemensos, dan Kemenkomdigi mengonfirmasi bahwa tidak pernah ada program pembagian dana tunai 10 juta rupiah melalui tautan grup Telegram. Tautan tersebut terindikasi kuat sebagai skema pencurian data kredensial perbankan (phishing) dan rekayasa sosial.
+          </div>
+        </div>
+
+        <!-- BREAKDOWN SKOR DALAM PROGRESS BAR -->
+        <div class="space-y-2.5">
+          <div class="text-[10px] text-neutral-400 uppercase font-bold tracking-wider">
+            Indeks Manipulasi & Kredibilitas:
+          </div>
+
+          <!-- Skor Hoax Total -->
+          <div>
+            <div class="flex justify-between text-[11px] mb-1 font-mono">
+              <span class="text-neutral-300">Skor Hoax Total</span>
+              <span id="score-hoax-val" class="font-bold text-[#ff2a2a]">94%</span>
+            </div>
+            <div class="w-full h-2 bg-neutral-900 rounded-full overflow-hidden">
+              <div id="bar-hoax" class="h-full bg-[#ff2a2a] rounded-full transition-all duration-500" style="width: 94%;"></div>
+            </div>
+          </div>
+
+          <!-- Fabrikasi Narasi -->
+          <div>
+            <div class="flex justify-between text-[11px] mb-1 font-mono">
+              <span class="text-neutral-300">Fabrikasi Narasi</span>
+              <span id="score-fab-val" class="font-bold text-red-400">91%</span>
+            </div>
+            <div class="w-full h-1.5 bg-neutral-900 rounded-full overflow-hidden">
+              <div id="bar-fab" class="h-full bg-red-500 rounded-full transition-all duration-500" style="width: 91%;"></div>
+            </div>
+          </div>
+
+          <!-- Pola Penyebaran -->
+          <div>
+            <div class="flex justify-between text-[11px] mb-1 font-mono">
+              <span class="text-neutral-300">Pola Penyebaran Serentak</span>
+              <span id="score-prop-val" class="font-bold text-amber-400">87%</span>
+            </div>
+            <div class="w-full h-1.5 bg-neutral-900 rounded-full overflow-hidden">
+              <div id="bar-prop" class="h-full bg-amber-500 rounded-full transition-all duration-500" style="width: 87%;"></div>
+            </div>
+          </div>
+
+          <!-- Kredibilitas Sumber -->
+          <div>
+            <div class="flex justify-between text-[11px] mb-1 font-mono">
+              <span class="text-neutral-300">Kredibilitas Sumber Asli</span>
+              <span id="score-cred-val" class="font-bold text-emerald-400">12%</span>
+            </div>
+            <div class="w-full h-1.5 bg-neutral-900 rounded-full overflow-hidden">
+              <div id="bar-cred" class="h-full bg-emerald-500 rounded-full transition-all duration-500" style="width: 12%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CHIP SUMBER RUJUKAN RESMI (LINK TERBUKA) -->
+        <div class="space-y-2">
+          <div class="text-[10px] text-neutral-400 uppercase font-bold tracking-wider">
+            Sumber Rujukan Resmi (Link Terbuka):
+          </div>
+          <div id="detail-sources-list" class="flex flex-wrap gap-1.5">
+            <!-- Diisi oleh JS -->
+          </div>
+        </div>
+
+        <!-- KATEGORI MEDIA PENYEBAR YANG DINAMIS PER BERITA -->
+        <div class="space-y-2">
+          <div class="text-[10px] text-neutral-400 uppercase font-bold tracking-wider">
+            Distribusi Media Penyebar Terindikasi:
+          </div>
+          <div id="detail-spreader-categories" class="space-y-1.5">
+            <!-- Diisi dinamis per berita -->
+          </div>
+        </div>
+
+        <!-- TOMBOL EKSPOR RINGKASAN INVESTIGASI UNTUK HACKATHON -->
+        <div class="pt-3 border-t border-[#1c1c24] flex gap-2">
+          <button onclick="exportHoaxDossier('json')" class="flex-1 bg-black border border-[#1c1c24] hover:border-[#ff2a2a] text-[10px] font-bold text-neutral-300 hover:text-white py-2 px-2 rounded uppercase tracking-wider transition flex items-center justify-center gap-1.5">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+            </svg>
+            <span>Ekspor JSON</span>
+          </button>
+          <button onclick="exportHoaxDossier('markdown')" class="flex-1 bg-red-950/80 border border-red-800 hover:bg-red-900 text-[10px] font-bold text-red-300 hover:text-white py-2 px-2 rounded uppercase tracking-wider transition flex items-center justify-center gap-1.5">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+            </svg>
+            <span>Laporan PoC (MD)</span>
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- ======================================================== -->
+  <!-- 6. FOOTER MINIMALIS 4 KOLOM (TANPA EMOJI)                -->
+  <!-- ======================================================== -->
+  <footer class="bg-[#040406] border-t border-[#1c1c24] pt-14 pb-12 px-4 md:px-8 text-neutral-400">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      
+      <!-- KOLOM 1: BRAND -->
+      <div class="space-y-3">
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 rounded border border-[#ff2a2a] bg-red-950/60 flex items-center justify-center text-[#ff2a2a] font-bold text-xs">
+            NV
+          </div>
+          <span class="text-sm font-extrabold tracking-widest text-white uppercase">NusaVision</span>
+        </div>
+        <p class="text-xs text-neutral-400 leading-relaxed font-mono">
+          Cognitive Domain Defense Radar // Platform intelijen siber sosial otonom untuk mendeteksi disinformasi, propaganda komputasional, jaringan botnet, dan polarisasi opini publik.
+        </p>
+        <div class="text-[10px] text-neutral-400 font-mono">
+          HAK CIPTA &copy; 2026 NUSAVISION RESEARCH TEAM
+        </div>
+      </div>
+
+      <!-- KOLOM 2: TIM & KOMPETISI -->
+      <div class="space-y-2.5">
+        <div class="text-xs font-bold text-white uppercase tracking-wider">
+          Tim & Kompetisi
+        </div>
+        <ul class="text-xs space-y-1.5 font-mono text-neutral-400">
+          <li class="hover:text-neutral-200 transition">Kartika Cyber Hackathon 2026</li>
+          <li class="hover:text-neutral-200 transition">Kategori: Siber Sosial (Cognitive Domain)</li>
+          <li class="hover:text-neutral-200 transition">Divisi Pertahanan Opini & OSINT</li>
+          <li class="hover:text-neutral-200 transition">Kerangka Kerja: AI Office Multi-Agent</li>
+        </ul>
+      </div>
+
+      <!-- KOLOM 3: KONTAK & PUSAT OPERASI -->
+      <div class="space-y-2.5">
+        <div class="text-xs font-bold text-white uppercase tracking-wider">
+          Pusat Operasi & Kontak
+        </div>
+        <ul class="text-xs space-y-1.5 font-mono text-neutral-400">
+          <li>Komando Operasi Intelijen Siber Sosial</li>
+          <li>Kanal Pelaporan Disinformasi Strategis</li>
+          <li>Protokol Bukti Digital: Open Source Intelligence</li>
+          <li>Enkripsi Saluran: TLS / SHA-256 Validated</li>
+        </ul>
+      </div>
+
+      <!-- KOLOM 4: STATUS PROYEK -->
+      <div class="space-y-2.5">
+        <div class="text-xs font-bold text-white uppercase tracking-wider">
+          Status Sistem & Build
+        </div>
+        <div class="bg-[#0e0e14] border border-[#1c1c24] p-3 rounded space-y-1.5 text-[10px] font-mono">
+          <div class="flex justify-between">
+            <span>Versi:</span>
+            <span class="text-neutral-200 font-bold">v2.4.0-Production</span>
+          </div>
+          <div class="flex justify-between">
+            <span>Model LLM:</span>
+            <span class="text-neutral-200">DeepSeek-R1 (8B Lokal)</span>
+          </div>
+          <div class="flex justify-between">
+            <span>Status Radar:</span>
+            <span class="text-emerald-400 font-bold">OPERATIONAL</span>
+          </div>
+          <div class="flex justify-between">
+            <span>Runtime Host:</span>
+            <span class="text-neutral-300">FastAPI + Uvicorn + WSL2</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom Copyright Line -->
+    <div class="max-w-7xl mx-auto border-t border-[#1c1c24] mt-10 pt-6 flex flex-col sm:flex-row justify-between items-center text-[10px] text-neutral-400 font-mono gap-2">
+      <div>NUSAVISION COGNITIVE DEFENSE RADAR // MILITARY-GRADE CYBER SOCIAL RADAR</div>
+      <div>DEFENSE READY // AUTONOMOUS AUDIT COMPLIANT</div>
+    </div>
+  </footer>
+
+  <!-- ======================================================== -->
+  <!-- JAVASCRIPT: LOGIKA LENGKAP & INTEGRASI BACKEND FASTAPI   -->
+  <!-- ======================================================== -->
+  <script>
+    /* -----------------------------------------------------------
+     * 1. PRELOADER & INITIALIZATION
+     * ----------------------------------------------------------- */
+    let preloaderProgress = 0;
+    const preloaderBar = document.getElementById("preloader-bar");
+    const preloaderPct = document.getElementById("preloader-pct");
+    const preloaderStatus = document.getElementById("preloader-status");
+    const preloaderElem = document.getElementById("preloader");
+
+    const preloaderSteps = [
+      { max: 25, text: "Menginisialisasi sistem siber & kernel radar..." },
+      { max: 55, text: "Menghubungkan ke reasoning engine (DeepSeek-R1)..." },
+      { max: 82, text: "Memuat modul Satgas Multi-Agent & kontrak operasional..." },
+      { max: 96, text: "Merender dashboard kognitif & topologi graf SNA..." },
+      { max: 100, text: "Sistem radar siaga penuh. Memulai pemantauan." }
+    ];
+
+    function advancePreloader() {
+      if (preloaderProgress < 100) {
+        preloaderProgress += Math.floor(Math.random() * 8) + 3;
+        if (preloaderProgress > 100) preloaderProgress = 100;
+        
+        preloaderBar.style.width = preloaderProgress + "%";
+        preloaderPct.innerText = preloaderProgress + "%";
+
+        const currentStep = preloaderSteps.find(s => preloaderProgress <= s.max) || preloaderSteps[preloaderSteps.length - 1];
+        preloaderStatus.innerText = currentStep.text;
+
+        const delay = preloaderProgress >= 80 ? 70 : 45;
+        setTimeout(advancePreloader, delay);
+      } else {
+        setTimeout(() => {
+          preloaderElem.classList.add("fade-out");
+          initApp();
+        }, 300);
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      advancePreloader();
+    });
+
+    /* -----------------------------------------------------------
+     * 2. MATRIX RAIN BACKGROUND (CANVAS)
+     * ----------------------------------------------------------- */
+    const matrixCanvas = document.getElementById("matrixCanvas");
+    const mCtx = matrixCanvas.getContext("2d");
+    function resizeMatrixCanvas() {
+      matrixCanvas.width = window.innerWidth;
+      matrixCanvas.height = window.innerHeight;
+    }
+    resizeMatrixCanvas();
+    window.addEventListener("resize", resizeMatrixCanvas);
+
+    const matrixChars = ["0", "1", "x", "f", "9", "a", "c", "d"];
+    const mFontSize = 15;
+    let mColumns = Math.floor(matrixCanvas.width / mFontSize);
+    let mDrops = [];
+    for (let i = 0; i < mColumns; i++) mDrops[i] = Math.random() * -100;
+
+    function drawMatrixRain() {
+      mCtx.fillStyle = "rgba(4, 4, 6, 0.08)";
+      mCtx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+      mCtx.fillStyle = "#ff1a1a";
+      mCtx.font = mFontSize + "px 'Courier New', Courier, monospace";
+
+      for (let i = 0; i < mDrops.length; i++) {
+        const text = matrixChars[Math.floor(Math.random() * matrixChars.length)];
+        mCtx.fillText(text, i * mFontSize, mDrops[i] * mFontSize);
+        if (mDrops[i] * mFontSize > matrixCanvas.height && Math.random() > 0.98) {
+          mDrops[i] = 0;
+        }
+        mDrops[i]++;
+      }
+    }
+    setInterval(drawMatrixRain, 40);
+
+    /* -----------------------------------------------------------
+     * 3. STICKY NAV & INTERSECTION OBSERVER FOR MINI LOGO
+     * ----------------------------------------------------------- */
+    const navMiniBrand = document.getElementById("nav-mini-brand");
+    const heroSection = document.getElementById("hero-section");
+
+    const heroObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) {
+          navMiniBrand.classList.remove("opacity-0", "-translate-x-4", "pointer-events-none");
+          navMiniBrand.classList.add("opacity-100", "translate-x-0", "pointer-events-auto");
+        } else {
+          navMiniBrand.classList.add("opacity-0", "-translate-x-4", "pointer-events-none");
+          navMiniBrand.classList.remove("opacity-100", "translate-x-0", "pointer-events-auto");
+        }
+      });
+    }, { threshold: 0.15 });
+
+    heroObserver.observe(heroSection);
+
+    // Nav Drawer Toggle
+    function toggleNavDrawer(forceState) {
+      const drawer = document.getElementById("nav-drawer");
+      const backdrop = document.getElementById("nav-drawer-backdrop");
+      const isOpen = !drawer.classList.contains("translate-x-full");
+      const shouldOpen = forceState !== undefined ? forceState : !isOpen;
+
+      if (shouldOpen) {
+        drawer.classList.remove("translate-x-full");
+        backdrop.classList.remove("opacity-0", "pointer-events-none");
+        backdrop.classList.add("opacity-100", "pointer-events-auto");
+      } else {
+        drawer.classList.add("translate-x-full");
+        backdrop.classList.add("opacity-0", "pointer-events-none");
+        backdrop.classList.remove("opacity-100", "pointer-events-auto");
+      }
+    }
+
+    /* -----------------------------------------------------------
+     * 4. HERO CAROUSEL CONTROLLER (CROSSFADE FEED vs PARTICLE SCAN)
+     * ----------------------------------------------------------- */
+    let currentSlide = 0;
+    let carouselInterval = null;
+    let liveTrendsData = [];
+    let currentSlideTarget = "#PilkadaSerentak2024";
+
+    function setCarouselSlide(index) {
+      currentSlide = index;
+      const slideFeed = document.getElementById("slide-feed");
+      const slideScanner = document.getElementById("slide-scanner");
+      const dot0 = document.getElementById("dot-slide-0");
+      const dot1 = document.getElementById("dot-slide-1");
+
+      if (index === 0) {
+        slideFeed.classList.remove("hidden");
+        slideScanner.classList.add("hidden");
+        dot0.className = "w-7 h-1.5 rounded-full bg-[#ff2a2a] transition-all";
+        dot1.className = "w-2 h-1.5 rounded-full bg-neutral-700 hover:bg-neutral-500 transition-all";
+      } else {
+        slideFeed.classList.add("hidden");
+        slideScanner.classList.remove("hidden");
+        dot0.className = "w-2 h-1.5 rounded-full bg-neutral-700 hover:bg-neutral-500 transition-all";
+        dot1.className = "w-7 h-1.5 rounded-full bg-[#ff2a2a] transition-all";
+        resizeParticleCanvas();
+      }
+    }
+
+    function rotateCarousel() {
+      setCarouselSlide(currentSlide === 0 ? 1 : 0);
+    }
+
+    function startCarouselTimer() {
+      if (carouselInterval) clearInterval(carouselInterval);
+      carouselInterval = setInterval(rotateCarousel, 4500);
+      document.getElementById("carousel-timer-text").innerText = "AUTO-ROTATE: AKTIF";
+    }
+
+    function pauseCarouselTimer() {
+      if (carouselInterval) clearInterval(carouselInterval);
+      document.getElementById("carousel-timer-text").innerText = "AUTO-ROTATE: PAUSED";
+    }
+
+    const carouselWrapper = document.getElementById("hero-carousel-wrapper");
+    carouselWrapper.addEventListener("mouseenter", pauseCarouselTimer);
+    carouselWrapper.addEventListener("mouseleave", startCarouselTimer);
+
+    /* -----------------------------------------------------------
+     * 5. SOCIAL NETWORK SCAN CANVAS (SLIDE B PARTICLE VISUAL)
+     * ----------------------------------------------------------- */
+    const pCanvas = document.getElementById("particleCanvas");
+    const pCtx = pCanvas.getContext("2d");
+    let particles = [];
+    let radarAngle = 0;
+
+    function resizeParticleCanvas() {
+      if (!pCanvas) return;
+      pCanvas.width = pCanvas.clientWidth || 340;
+      pCanvas.height = pCanvas.clientHeight || 130;
+      initParticles();
+    }
+
+    function initParticles() {
+      particles = [];
+      const count = 30;
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: Math.random() * pCanvas.width,
+          y: Math.random() * pCanvas.height,
+          vx: (Math.random() - 0.5) * 0.9,
+          vy: (Math.random() - 0.5) * 0.9,
+          radius: i === 0 ? 4 : (Math.random() > 0.8 ? 3 : 1.8),
+          isLeader: i === 0
+        });
+      }
+    }
+
+    function drawParticleScan() {
+      pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+
+      const cx = pCanvas.width / 2;
+      const cy = pCanvas.height / 2;
+
+      // Draw sweeping radar line
+      radarAngle += 0.035;
+      const rx = cx + Math.cos(radarAngle) * pCanvas.width;
+      const ry = cy + Math.sin(radarAngle) * pCanvas.width;
+
+      const grad = pCtx.createRadialGradient(cx, cy, 5, cx, cy, pCanvas.width * 0.7);
+      grad.addColorStop(0, "rgba(255, 42, 42, 0.2)");
+      grad.addColorStop(1, "rgba(255, 42, 42, 0)");
+
+      pCtx.fillStyle = grad;
+      pCtx.beginPath();
+      pCtx.moveTo(cx, cy);
+      pCtx.arc(cx, cy, pCanvas.width * 0.7, radarAngle - 0.35, radarAngle);
+      pCtx.closePath();
+      pCtx.fill();
+
+      // Draw connecting lines between particles
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < 65) {
+            pCtx.strokeStyle = `rgba(255, 42, 42, ${0.45 * (1 - dist / 65)})`;
+            pCtx.lineWidth = 0.8;
+            pCtx.beginPath();
+            pCtx.moveTo(particles[i].x, particles[i].y);
+            pCtx.lineTo(particles[j].x, particles[j].y);
+            pCtx.stroke();
+          }
+        }
+      }
+
+      // Update & draw particles
+      particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < 0 || p.x > pCanvas.width) p.vx *= -1;
+        if (p.y < 0 || p.y > pCanvas.height) p.vy *= -1;
+
+        pCtx.beginPath();
+        pCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        pCtx.fillStyle = p.isLeader ? "#ff0000" : (p.radius > 2 ? "#ef4444" : "#94a3b8");
+        pCtx.fill();
+
+        if (p.isLeader) {
+          pCtx.strokeStyle = "rgba(255, 255, 255, 0.8)";
+          pCtx.lineWidth = 1;
+          pCtx.stroke();
+        }
+      });
+
+      requestAnimationFrame(drawParticleScan);
+    }
+
+    /* -----------------------------------------------------------
+     * 6. DASHBOARD SENTIMEN: CHART.JS & TIME RANGE
+     * ----------------------------------------------------------- */
+    let sentimentChart = null;
+    let currentRange = "harian";
+
+    function initSentimentChart(data) {
+      const ctx = document.getElementById("sentimentChart").getContext("2d");
+      if (sentimentChart) sentimentChart.destroy();
+
+      sentimentChart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: data.labels,
+          datasets: [
+            {
+              label: "Positif",
+              data: data.positive,
+              borderColor: "#10b981",
+              backgroundColor: "rgba(16, 185, 129, 0.08)",
+              borderWidth: 2,
+              tension: 0.35,
+              fill: true,
+              pointBackgroundColor: "#10b981",
+              pointRadius: 3
+            },
+            {
+              label: "Negatif",
+              data: data.negative,
+              borderColor: "#ff2a2a",
+              backgroundColor: "rgba(255, 42, 42, 0.12)",
+              borderWidth: 2.2,
+              tension: 0.35,
+              fill: true,
+              pointBackgroundColor: "#ff2a2a",
+              pointRadius: 3
+            },
+            {
+              label: "Netral",
+              data: data.neutral,
+              borderColor: "#94a3b8",
+              backgroundColor: "rgba(148, 163, 184, 0.04)",
+              borderWidth: 1.5,
+              borderDash: [4, 4],
+              tension: 0.35,
+              fill: false,
+              pointBackgroundColor: "#94a3b8",
+              pointRadius: 2
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: "#0e0e14",
+              titleColor: "#ff2a2a",
+              bodyColor: "#e6edf3",
+              borderColor: "#1c1c24",
+              borderWidth: 1,
+              padding: 10,
+              titleFont: { family: "'Courier New', Courier, monospace", weight: 'bold' },
+              bodyFont: { family: "'Courier New', Courier, monospace" }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: "#1c1c24" },
+              ticks: { color: "#737373", font: { family: "'Courier New', Courier, monospace", size: 10 } }
+            },
+            y: {
+              grid: { color: "#1c1c24" },
+              ticks: { color: "#737373", font: { family: "'Courier New', Courier, monospace", size: 10 } }
+            }
+          }
+        }
+      });
+    }
+
+    function changeTimeRange(range) {
+      currentRange = range;
+      document.querySelectorAll(".range-btn").forEach(btn => {
+        btn.className = "range-btn px-3 py-1.5 rounded text-xs font-bold transition text-neutral-400 hover:text-white";
+      });
+      const activeBtn = document.getElementById("btn-range-" + range);
+      if (activeBtn) {
+        activeBtn.className = "range-btn px-3 py-1.5 rounded text-xs font-bold transition bg-red-950 text-red-300 border border-red-800 glow-red-sm";
+      }
+
+      fetch(`/api/sentiment-trends?range=${range}`)
+        .then(res => res.json())
+        .then(data => {
+          updateSentimentView(data);
+        })
+        .catch(err => {
+          console.warn("Gagal fetch /api/sentiment-trends:", err);
+        });
+    }
+
+    function updateSentimentView(data) {
+      if (!data) return;
+      initSentimentChart(data);
+
+      if (data.summary) {
+        document.getElementById("stat-polarization").innerText = data.summary.polarization || "72% (TINGGI)";
+        document.getElementById("stat-dominant").innerText = data.summary.dominant || "Negatif";
+        document.getElementById("stat-volume").innerText = data.summary.volume || "340K Transmisi";
+      }
+
+      const labelsMap = {
+        harian: "Rentang: 24 Jam Terakhir",
+        mingguan: "Rentang: 7 Hari Terakhir",
+        bulanan: "Rentang: 4 Minggu Terakhir",
+        tahunan: "Rentang: 12 Bulan Terakhir"
+      };
+      document.getElementById("chart-range-label").innerText = labelsMap[currentRange] || "Rentang Terpilih";
+
+      if (data.early_warnings) {
+        renderEarlyWarningList(data.early_warnings);
+      }
+      if (data.hashtags) {
+        renderHashtagGrid(data.hashtags);
+      }
+    }
+
+    function renderEarlyWarningList(list) {
+      const container = document.getElementById("early-warning-list");
+      container.innerHTML = "";
+
+      let orchestratedCount = 0;
+
+      list.forEach((item, idx) => {
+        const isOrchestrated = item.status === "orchestrated";
+        if (isOrchestrated) orchestratedCount++;
+
+        const dotClass = isOrchestrated 
+          ? "w-2.5 h-2.5 rounded-full bg-[#ff2a2a] animate-pulse glow-red-sm" 
+          : "w-2.5 h-2.5 rounded-full bg-emerald-500 glow-green";
+
+        const badgeHtml = isOrchestrated
+          ? `<span class="bg-red-950 text-red-300 border border-red-800 text-[9px] px-1.5 py-0.2 rounded font-bold font-mono">TERORKESTRASI</span>`
+          : `<span class="bg-neutral-900 text-neutral-300 border border-neutral-800 text-[9px] px-1.5 py-0.2 rounded font-mono">NATURAL</span>`;
+
+        container.innerHTML += `
+          <div onclick="investigateTarget('${item.topic}')" class="group p-3 bg-black/60 hover:bg-neutral-900 border border-[#1c1c24] hover:border-red-900 rounded cursor-pointer transition">
+            <div class="flex items-center justify-between mb-1">
+              <div class="flex items-center gap-2">
+                <span class="${dotClass}"></span>
+                <span class="font-bold text-xs text-neutral-200 group-hover:text-[#ff2a2a] transition font-mono">${item.topic}</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                ${badgeHtml}
+                <span class="text-[10px] text-neutral-400 font-mono">${item.velocity || '+100%/jam'}</span>
+              </div>
+            </div>
+            <p class="text-[11px] text-neutral-400 leading-snug line-clamp-1">${item.headline}</p>
+            <div class="text-[9px] text-neutral-400 mt-1 flex justify-between font-mono">
+              <span>${item.surge_desc || 'Pola transmisi'}</span>
+              <span class="text-[#ff2a2a] group-hover:underline">Audit SNA &rarr;</span>
+            </div>
+          </div>
+        `;
+      });
+
+      document.getElementById("stat-surge").innerText = `${orchestratedCount} Terorkestrasi`;
+    }
+
+    function renderHashtagGrid(hashtags) {
+      const container = document.getElementById("hashtag-grid");
+      container.innerHTML = "";
+
+      hashtags.forEach(h => {
+        const isUp = h.trend === "up";
+        const isDown = h.trend === "down";
+        const isPos = h.sentiment === "positive";
+
+        const trendColor = isUp ? "text-[#ff2a2a]" : (isPos ? "text-emerald-400" : "text-neutral-400");
+        const arrowSvg = isUp
+          ? `<svg class="w-3.5 h-3.5 text-[#ff2a2a]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"/></svg>`
+          : (isDown
+            ? `<svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 4.5l15 15m0 0V8.25m0 11.25H8.25"/></svg>`
+            : `<svg class="w-3.5 h-3.5 text-neutral-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5"/></svg>`);
+
+        container.innerHTML += `
+          <div onclick="investigateTarget('${h.tag}')" class="bg-[#0e0e14] border border-[#1c1c24] hover:border-[#ff2a2a] p-3.5 rounded-lg cursor-pointer transition group">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-xs font-bold text-neutral-200 group-hover:text-white font-mono">${h.tag}</span>
+              ${arrowSvg}
+            </div>
+            <div class="flex items-baseline justify-between">
+              <span class="text-sm font-extrabold text-white font-mono">${h.volume}</span>
+              <span class="text-[10px] ${trendColor} font-mono font-bold">${h.polarity}</span>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    /* -----------------------------------------------------------
+     * 7. SOCIAL NETWORK ANALYSIS (D3.JS) & SATGAS MULTI-AGENT
+     * ----------------------------------------------------------- */
+    let d3GraphData = { nodes: [], links: [] };
+    let d3Simulation = null;
+    let d3Svg = null;
+    let d3LinkElements = null;
+    let d3NodeElements = null;
+    let d3Zoom = null;
+    let currentInvestigationId = null;
+
+    function renderD3Graph(graph) {
+      d3GraphData = graph;
+      const box = document.getElementById("sna-graph-box");
+      box.innerHTML = "";
+
+      const w = box.clientWidth || 700;
+      const h = box.clientHeight || 400;
+
+      d3Svg = d3.select("#sna-graph-box")
+        .append("svg")
+        .attr("width", w)
+        .attr("height", h)
+        .attr("id", "sna-svg");
+
+      // Container group for Zoom & Pan
+      const g = d3Svg.append("g").attr("id", "sna-zoom-group");
+
+      d3Zoom = d3.zoom()
+        .scaleExtent([0.3, 4])
+        .on("zoom", (event) => {
+          g.attr("transform", event.transform);
+        });
+
+      d3Svg.call(d3Zoom);
+
+      d3Simulation = d3.forceSimulation(graph.nodes)
+        .force("link", d3.forceLink(graph.links).id(d => d.id).distance(50))
+        .force("charge", d3.forceManyBody().strength(-120))
+        .force("center", d3.forceCenter(w / 2, h / 2))
+        .force("collision", d3.forceCollide().radius(d => (d.radius || 8) + 4));
+
+      // Draw Links
+      d3LinkElements = g.append("g")
+        .attr("class", "links")
+        .selectAll("line")
+        .data(graph.links)
+        .join("line")
+        .attr("stroke", d => d.weight > 0.7 ? "#dc2626" : "#475569")
+        .attr("stroke-opacity", d => d.weight > 0.7 ? 0.75 : 0.35)
+        .attr("stroke-width", d => Math.max(0.9, (d.weight || 1) * 2.2));
+
+      // Draw Nodes
+      d3NodeElements = g.append("g")
+        .attr("class", "nodes")
+        .selectAll("circle")
+        .data(graph.nodes)
+        .join("circle")
+        .attr("r", d => d.radius || (d.is_dalang ? 14 : (d.group === "bot" ? 7 : 5)))
+        .attr("fill", d => d.is_dalang ? "#ff0000" : (d.group === "bot" ? "#ef4444" : "#64748b"))
+        .attr("stroke", d => d.is_dalang ? "#ffffff" : (d.group === "bot" ? "#fee2e2" : "#1e293b"))
+        .attr("stroke-width", d => d.is_dalang ? 2.8 : 1.2)
+        .style("cursor", "pointer")
+        .call(d3.drag()
+          .on("start", (event, d) => {
+            if (!event.active) d3Simulation.alphaTarget(0.3).restart();
+            d.fx = d.x; d.fy = d.y;
+          })
+          .on("drag", (event, d) => {
+            d.fx = event.x; d.fy = event.y;
+          })
+          .on("end", (event, d) => {
+            if (!event.active) d3Simulation.alphaTarget(0);
+            d.fx = null; d.fy = null;
+          })
+        )
+        .on("click", (event, d) => {
+          selectNode(d);
+        });
+
+      d3Simulation.on("tick", () => {
+        d3LinkElements
+          .attr("x1", d => d.source.x)
+          .attr("y1", d => d.source.y)
+          .attr("x2", d => d.target.x)
+          .attr("y2", d => d.target.y);
+
+        d3NodeElements
+          .attr("cx", d => d.x)
+          .attr("cy", d => d.y);
+      });
+
+      renderAffiliatedAvatars(graph.nodes);
+    }
+
+    function selectNode(d) {
+      if (!d3NodeElements) return;
+
+      d3NodeElements.classed("node-highlight", n => n.id === d.id);
+      showNodeProfile(d);
+
+      // Check if node is connected to dalang or is a bot
+      const aiWarningPanel = document.getElementById("ai-warning-panel");
+      const aiWarningText = document.getElementById("ai-warning-text");
+
+      if (d.group === "bot" || d.is_dalang) {
+        aiWarningPanel.classList.remove("hidden");
+        aiWarningText.innerText = d.is_dalang
+          ? `PERINGATAN SIBER: Akun ${d.id} teridentifikasi sebagai SIMPUL SENTRAL KOORDINATOR (DALANG UTAMA) dengan transmisi perintah botnet terpusat.`
+          : `PERINGATAN SIBER: Akun ${d.id} terhubung langsung ke jaringan amplifikasi botnet. Skor probabilitas bot ${d.score}%. Modus: ${d.alasan_deteksi || 'Duplikasi narasi massal'}.`;
+      } else {
+        aiWarningPanel.classList.add("hidden");
+      }
+    }
+
+    function resetGraphZoom() {
+      if (d3Svg && d3Zoom) {
+        d3Svg.transition().duration(500).call(d3Zoom.transform, d3.zoomIdentity);
+        clearSNASearch();
+      }
+    }
+
+    // MULTI-HOP SEARCH TRAVERSAL
+    function handleSNASearch(query) {
+      const q = query.trim().toLowerCase();
+      const statusBadge = document.getElementById("search-status-badge");
+      const clearBtn = document.getElementById("btn-clear-search");
+
+      if (!q) {
+        clearSNASearch();
+        return;
+      }
+
+      clearBtn.classList.remove("hidden");
+
+      if (!d3GraphData || !d3GraphData.nodes) return;
+
+      // Find matching node(s)
+      const matchedNode = d3GraphData.nodes.find(n => 
+        n.id.toLowerCase().includes(q) || (n.display_name && n.display_name.toLowerCase().includes(q))
+      );
+
+      if (!matchedNode) {
+        statusBadge.innerText = `Tidak ditemukan: "${q}"`;
+        return;
+      }
+
+      // Compute Multi-Hop connected nodes (1st and 2nd degree)
+      const hop1 = new Set();
+      const hop2 = new Set();
+      hop1.add(matchedNode.id);
+
+      // 1st degree
+      d3GraphData.links.forEach(l => {
+        const sId = typeof l.source === "object" ? l.source.id : l.source;
+        const tId = typeof l.target === "object" ? l.target.id : l.target;
+        if (sId === matchedNode.id) hop1.add(tId);
+        if (tId === matchedNode.id) hop1.add(sId);
+      });
+
+      // 2nd degree
+      d3GraphData.links.forEach(l => {
+        const sId = typeof l.source === "object" ? l.source.id : l.source;
+        const tId = typeof l.target === "object" ? l.target.id : l.target;
+        if (hop1.has(sId)) hop2.add(tId);
+        if (hop1.has(tId)) hop2.add(sId);
+      });
+
+      const multiHopNodes = new Set([...hop1, ...hop2]);
+
+      // Apply Dimming & Highlight classes
+      d3NodeElements
+        .classed("node-dimmed", n => !multiHopNodes.has(n.id))
+        .classed("node-highlight", n => n.id === matchedNode.id);
+
+      d3LinkElements
+        .classed("link-dimmed", l => {
+          const sId = typeof l.source === "object" ? l.source.id : l.source;
+          const tId = typeof l.target === "object" ? l.target.id : l.target;
+          return !(multiHopNodes.has(sId) && multiHopNodes.has(tId));
+        })
+        .classed("link-highlight", l => {
+          const sId = typeof l.source === "object" ? l.source.id : l.source;
+          const tId = typeof l.target === "object" ? l.target.id : l.target;
+          return (sId === matchedNode.id || tId === matchedNode.id);
+        });
+
+      statusBadge.innerText = `Multi-Hop: ${multiHopNodes.size} node terhubung terisolasi`;
+
+      // Select and display profile
+      selectNode(matchedNode);
+
+      // Smooth zoom and pan to the searched node
+      if (d3Svg && d3Zoom && matchedNode.x && matchedNode.y) {
+        const box = document.getElementById("sna-graph-box");
+        const w = box.clientWidth;
+        const h = box.clientHeight;
+        const transform = d3.zoomIdentity.translate(w / 2 - matchedNode.x * 1.5, h / 2 - matchedNode.y * 1.5).scale(1.5);
+        d3Svg.transition().duration(600).call(d3Zoom.transform, transform);
+      }
+    }
+
+    function clearSNASearch() {
+      document.getElementById("sna-search-input").value = "";
+      document.getElementById("btn-clear-search").classList.add("hidden");
+      document.getElementById("search-status-badge").innerText = "";
+
+      if (d3NodeElements) d3NodeElements.classed("node-dimmed", false).classed("node-highlight", false);
+      if (d3LinkElements) d3LinkElements.classed("link-dimmed", false).classed("link-highlight", false);
+    }
+
+    function renderAffiliatedAvatars(nodes) {
+      const row = document.getElementById("affiliated-avatar-row");
+      const countLabel = document.getElementById("avatar-count-label");
+      row.innerHTML = "";
+
+      if (!nodes || nodes.length === 0) {
+        countLabel.innerText = "0 Akun";
+        return;
+      }
+
+      // Pick top nodes (dalang, high-bot score, influencer)
+      const topAccounts = [...nodes]
+        .sort((a, b) => (b.score || 0) - (a.score || 0))
+        .slice(0, 10);
+
+      countLabel.innerText = `${topAccounts.length} Akun Terindikasi`;
+
+      topAccounts.forEach(acc => {
+        const initials = acc.id ? acc.id.replace('@', '').substring(0, 2).toUpperCase() : "NV";
+        const isDalang = acc.is_dalang;
+        const isBot = acc.group === "bot";
+
+        const bgClass = isDalang 
+          ? "bg-[#ff0000] text-white ring-2 ring-white" 
+          : (isBot ? "bg-red-950 text-red-300 border border-red-800" : "bg-neutral-800 text-neutral-300");
+
+        // Use high-res avatar token with initials and platform tag
+        row.innerHTML += `
+          <button onclick="handleSNASearch('${acc.id}')" title="${acc.display_name} (${acc.id}) - Skor: ${acc.score}%" class="flex items-center gap-1.5 p-1 bg-black/60 hover:bg-neutral-900 border border-[#1c1c24] hover:border-[#ff2a2a] rounded px-2 shrink-0 transition text-left">
+            <div class="w-6 h-6 rounded-full ${bgClass} flex items-center justify-center text-[10px] font-bold font-mono">
+              ${initials}
+            </div>
+            <div class="text-[10px]">
+              <div class="text-neutral-200 font-bold font-mono truncate max-w-[90px]">${acc.id}</div>
+              <div class="text-[9px] text-neutral-400 font-mono">${acc.score}% bot</div>
+            </div>
+          </button>
+        `;
+      });
+    }
+
+    function showNodeProfile(d) {
+      const card = document.getElementById("profile-card");
+      const dalangBadge = d.is_dalang 
+        ? '<span class="bg-[#ff0000] text-white font-bold px-2 py-0.5 rounded text-[9px] animate-pulse">★ DALANG UTAMA</span>' 
+        : '';
+
+      const botBadge = d.group === 'bot' 
+        ? `<span class="bg-red-950 text-red-400 border border-red-800 px-1.5 py-0.5 rounded text-[9px]">Tersangka Botnet (${d.score}%)</span>`
+        : `<span class="bg-neutral-800 text-neutral-300 px-1.5 py-0.5 rounded text-[9px]">Akun Organik (${d.score}%)</span>`;
+
+      const followersCount = d.is_dalang ? "48.2K" : (d.group === "bot" ? "1,240" : "8,950");
+      const influenceScore = d.is_dalang ? "96 / 100" : (d.group === "bot" ? `${d.score} / 100` : "45 / 100");
+
+      card.innerHTML = `
+        <div class="flex items-center gap-3 border-b border-[#1c1c24] pb-2.5">
+          <div class="w-9 h-9 rounded-full ${d.is_dalang ? 'bg-red-600 ring-2 ring-white' : (d.group === 'bot' ? 'bg-red-900' : 'bg-neutral-800')} flex items-center justify-center font-bold text-white text-xs font-mono">
+            ${d.id ? d.id.replace('@', '').substring(0, 2).toUpperCase() : 'NV'}
+          </div>
+          <div>
+            <div class="font-bold text-white text-xs">${d.display_name || d.id}</div>
+            <div class="text-[10px] text-neutral-400 font-mono">${d.id} • ${d.platform || 'Twitter / X'}</div>
+          </div>
+        </div>
+
+        <div class="pt-0.5 flex flex-wrap items-center gap-1.5">${dalangBadge} ${botBadge}</div>
+
+        <!-- Metrics Grid -->
+        <div class="grid grid-cols-2 gap-2 text-[10px] text-neutral-400 bg-neutral-950 p-2 rounded border border-[#1c1c24] font-mono">
+          <div>Followers: <b class="text-neutral-200">${followersCount}</b></div>
+          <div>Pengaruh: <b class="text-neutral-200">${influenceScore}</b></div>
+          <div>Umur Akun: <b class="text-neutral-200">${d.umur_akun_hari || 0} hari</b></div>
+          <div>Aktif: <b class="text-neutral-200">${d.waktu_posting || 'Terbaru'}</b></div>
+        </div>
+
+        <div class="text-[11px] text-neutral-300">
+          <b class="text-neutral-400 text-[10px]">Bio:</b> ${d.bio || 'Pengguna media sosial publik'}
+        </div>
+
+        <div class="text-[11px] text-neutral-300 bg-red-950/20 p-2 rounded border border-red-900/40">
+          <b class="text-red-400 text-[10px]">Pola Deteksi / Alasan:</b><br>
+          <span class="text-neutral-300 text-[10px]">${d.alasan_deteksi || 'Aktivitas posting wajar'}</span>
+        </div>
+
+        <div class="text-[11px] text-neutral-400 bg-black p-2 rounded border border-[#1c1c24]">
+          <b class="text-neutral-300 text-[10px]">Sampel Postingan:</b><br>
+          <span class="text-neutral-300 italic text-[10px]">"${d.sample_post || '-'}"</span>
+        </div>
+      `;
+    }
+
+    /* -----------------------------------------------------------
+     * 8. STREAMING INVESTIGASI MULTI-AGENT (SSE)
+     * ----------------------------------------------------------- */
+    function setAgentStatus(id, state, text) {
+      const card = document.getElementById("card-" + id);
+      const lbl = document.getElementById("status-" + id);
+      if (!card || !lbl) return;
+
+      lbl.innerText = text;
+      if (state === "working") {
+        card.className = "border border-[#ff2a2a] bg-red-950/40 p-2 rounded transition-all glow-red-sm";
+      } else if (state === "done") {
+        card.className = "border border-neutral-700 bg-[#0e0e14] p-2 rounded transition-all";
+      } else {
+        card.className = "border border-[#1c1c24] bg-black/40 p-2 rounded transition-all";
+      }
+    }
+
+    function startInvestigation() {
+      const topikInput = document.getElementById("inputTopik");
+      const topik = topikInput.value.trim() || "#PilkadaSerentak2024";
+
+      document.getElementById("target-lbl-sub").innerText = "TARGET: " + topik;
+      document.getElementById("agent-active-counter").innerText = "OPERASI SEDANG BERJALAN...";
+
+      // Reset Ekspor
+      document.getElementById("btn-export-json").disabled = true;
+      document.getElementById("btn-export-md").disabled = true;
+
+      const officeLog = document.getElementById("office-log");
+      officeLog.innerText = `> Mengontak Commander Boss AI untuk target: "${topik}"...`;
+
+      // Reset card status
+      ["boss", "agent_1", "agent_2", "agent_3", "agent_4"].forEach(ag => setAgentStatus(ag, "standby", "STANDBY"));
+
+      const evt = new EventSource("/api/stream-investigation?topik=" + encodeURIComponent(topik));
+
+      evt.onmessage = function(e) {
+        try {
+          const d = JSON.parse(e.data);
+          officeLog.innerText = "> " + (d.message || "Memproses...");
+
+          if (d.stage === "boss") {
+            if (d.investigation_id) currentInvestigationId = d.investigation_id;
+            setAgentStatus("boss", "done", "COORDINATING");
+          } else if (d.stage === "agent_1") {
+            if (d.status === "working") setAgentStatus("agent_1", "working", "ANALYZING");
+            if (d.status === "done") setAgentStatus("agent_1", "done", "SURGE CONFIRMED");
+          } else if (d.stage === "agent_2") {
+            if (d.status === "working") setAgentStatus("agent_2", "working", "DEEPSEEK R1");
+            if (d.status === "done") setAgentStatus("agent_2", "done", "NARRATIVE PARSED");
+          } else if (d.stage === "agent_3") {
+            if (d.status === "working") {
+              setAgentStatus("agent_3", "working", "MAPPING SNA");
+            } else {
+              setAgentStatus("agent_3", "done", "BOTNET LOCKED");
+              if (d.data && d.data.network_graph) {
+                renderD3Graph(d.data.network_graph);
+                if (d.data.network_graph.nodes && d.data.network_graph.nodes[0]) {
+                  selectNode(d.data.network_graph.nodes[0]);
+                }
+              }
+            }
+          } else if (d.stage === "agent_4") {
+            if (d.status === "done") {
+              setAgentStatus("agent_4", "done", "POC VERIFIED");
+              document.getElementById("agent-active-counter").innerText = "OPERASI SELESAI // POC SIAGA";
+              
+              if (d.final_poc) {
+                currentInvestigationId = d.final_poc.investigation_id;
+                document.getElementById("poc-summary-box").innerText = d.final_poc.ringkasan || "PoC tervalidasi.";
+                const tb = document.getElementById("poc-threat-badge");
+                tb.innerText = d.final_poc.threat_level || "CRITICAL THREAT";
+                tb.className = "font-extrabold text-[#ff2a2a] font-mono animate-pulse";
+              }
+
+              document.getElementById("btn-export-json").disabled = false;
+              document.getElementById("btn-export-md").disabled = false;
+              evt.close();
+            }
+          }
+        } catch (err) {
+          console.error("Error parsing SSE:", err);
+        }
+      };
+
+      evt.onerror = function() {
+        officeLog.innerText = "> [SSE STREAM COMPLETED]";
+        evt.close();
+      };
+    }
+
+    function investigateTarget(target) {
+      if (!target) return;
+      document.getElementById("inputTopik").value = target;
+      
+      const snaElem = document.getElementById("sna-section");
+      if (snaElem) snaElem.scrollIntoView({ behavior: "smooth" });
+
+      setTimeout(startInvestigation, 500);
+    }
+
+    function exportPoC(format) {
+      if (!currentInvestigationId) {
+        alert("Investigasi belum selesai atau ID PoC belum diterbitkan.");
+        return;
+      }
+      window.open(`/api/export-poc/${currentInvestigationId}?format=${format}`, "_blank");
+    }
+
+    /* -----------------------------------------------------------
+     * 9. HOAX CLASSIFIER CONTROLLER & RAG FACT LAB
+     * ----------------------------------------------------------- */
+    let hoaxFeedData = [];
+    let selectedHoaxItem = null;
+
+    function loadHoaxFeed() {
+      fetch("/api/hoax-feed")
+        .then(res => res.json())
+        .then(data => {
+          hoaxFeedData = data;
+          renderHoaxCards(data);
+          if (data && data[0]) {
+            showHoaxDetail(data[0]);
+          }
+        })
+        .catch(err => {
+          console.warn("Gagal fetch /api/hoax-feed:", err);
+        });
+    }
+
+    function renderHoaxCards(list) {
+      const container = document.getElementById("hoax-cards-container");
+      container.innerHTML = "";
+
+      list.forEach((item, idx) => {
+        container.innerHTML += `
+          <div onclick="selectHoaxCard('${item.id}')" class="hoax-card group p-3.5 bg-[#0e0e14] hover:bg-neutral-900 border border-[#1c1c24] hover:border-[#ff2a2a] rounded-lg cursor-pointer transition space-y-2">
+            <div class="flex items-center justify-between text-[10px]">
+              <span class="text-red-400 font-mono font-bold">${item.topic}</span>
+              <span class="bg-red-950 text-red-300 border border-red-800 px-2 py-0.5 rounded font-mono font-bold">${item.hoax_score}% HOAKS</span>
+            </div>
+            <h4 class="text-xs font-bold text-neutral-200 group-hover:text-white leading-snug line-clamp-2">
+              ${item.title}
+            </h4>
+            <div class="flex items-center justify-between text-[10px] text-neutral-400 pt-1 font-mono">
+              <span>Platform: <b class="text-neutral-300">${item.platform}</b></span>
+              <span>${item.date}</span>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function selectHoaxCard(id) {
+      const item = hoaxFeedData.find(h => h.id === id);
+      if (item) showHoaxDetail(item);
+    }
+
+    function showHoaxDetail(item) {
+      selectedHoaxItem = item;
+
+      document.getElementById("detail-hoax-id").innerText = item.id;
+      document.getElementById("detail-hoax-title").innerText = item.title;
+      document.getElementById("detail-platform-badge").innerText = item.platform;
+      document.getElementById("detail-date").innerText = item.date;
+      document.getElementById("detail-fact-summary").innerText = item.fact_summary;
+
+      // Progress bar breakdown
+      document.getElementById("score-hoax-val").innerText = item.hoax_score + "%";
+      document.getElementById("bar-hoax").style.width = item.hoax_score + "%";
+
+      document.getElementById("score-fab-val").innerText = item.fabrication_score + "%";
+      document.getElementById("bar-fab").style.width = item.fabrication_score + "%";
+
+      document.getElementById("score-prop-val").innerText = item.propagation_score + "%";
+      document.getElementById("bar-prop").style.width = item.propagation_score + "%";
+
+      document.getElementById("score-cred-val").innerText = item.credibility_score + "%";
+      document.getElementById("bar-cred").style.width = item.credibility_score + "%";
+
+      // Sources
+      const srcContainer = document.getElementById("detail-sources-list");
+      srcContainer.innerHTML = "";
+      if (item.sources && item.sources.length > 0) {
+        item.sources.forEach(s => {
+          srcContainer.innerHTML += `
+            <a href="${s.url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 bg-black hover:bg-neutral-900 border border-[#1c1c24] hover:border-[#ff2a2a] text-[10px] text-red-300 px-2 py-1 rounded transition font-mono">
+              <span>${s.domain || s.title}</span>
+              <svg class="w-3 h-3 text-neutral-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+              </svg>
+            </a>
+          `;
+        });
+      }
+
+      // Spreader categories
+      const spreadContainer = document.getElementById("detail-spreader-categories");
+      spreadContainer.innerHTML = "";
+      if (item.spreader_categories) {
+        item.spreader_categories.forEach(sc => {
+          spreadContainer.innerHTML += `
+            <div>
+              <div class="flex justify-between text-[10px] text-neutral-300 font-mono mb-0.5">
+                <span>${sc.name}</span>
+                <span>${sc.pct}% (${sc.count})</span>
+              </div>
+              <div class="w-full h-1 bg-neutral-900 rounded-full overflow-hidden">
+                <div class="h-full bg-neutral-600 rounded-full" style="width: ${sc.pct}%;"></div>
+              </div>
+            </div>
+          `;
+        });
+      }
+    }
+
+    function exportHoaxDossier(format) {
+      if (!selectedHoaxItem) return;
+
+      if (format === "json") {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(selectedHoaxItem, null, 2));
+        const a = document.createElement("a");
+        a.href = dataStr;
+        a.download = `NusaVision_Hoax_Report_${selectedHoaxItem.id}.json`;
+        a.click();
+      } else {
+        const mdText = `# NUSAVISION — FORENSIC HOAX INVESTIGATION DOSSIER\n\n- ID: ${selectedHoaxItem.id}\n- Judul: ${selectedHoaxItem.title}\n- Platform: ${selectedHoaxItem.platform}\n- Skor Hoaks: ${selectedHoaxItem.hoax_score}%\n- Tanggal Audit: ${selectedHoaxItem.date}\n\n## Ringkasan Fakta RAG\n${selectedHoaxItem.fact_summary}\n\n## Sumber Klarifikasi Resmi\n${(selectedHoaxItem.sources || []).map(s => `- [${s.title}](${s.url})`).join('\n')}\n`;
+        const dataStr = "data:text/markdown;charset=utf-8," + encodeURIComponent(mdText);
+        const a = document.createElement("a");
+        a.href = dataStr;
+        a.download = `NusaVision_Hoax_Report_${selectedHoaxItem.id}.md`;
+        a.click();
+      }
+    }
+
+    // Uji Klaim Kustom Dual-Mode RAG
+    function runCustomFactCheck() {
+      const text = document.getElementById("hoax-custom-input").value.trim();
+      if (!text) return;
+
+      const resultBox = document.getElementById("custom-fact-result");
+      const statusLabel = document.getElementById("custom-check-status");
+      const btn = document.getElementById("btn-custom-check");
+
+      btn.disabled = true;
+      statusLabel.innerText = "MENGANALISIS DENGAN DEEPSEEK...";
+      resultBox.classList.remove("hidden");
+      resultBox.innerHTML = `<span class="text-neutral-400 font-mono">Menelusuri database periksa fakta & menalar bukti digital...</span>`;
+
+      fetch("/api/hoax-check", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode: "deep_fact_check", text_content: text })
+      })
+      .then(res => res.json())
+      .then(d => {
+        btn.disabled = false;
+        statusLabel.innerText = "SELESAI";
+
+        const indicators = (d.manipulation_indicators || []).map(ind => 
+          `<span class="bg-red-950 text-red-300 border border-red-800 text-[9px] px-1.5 py-0.5 rounded font-mono">${ind}</span>`
+        ).join(" ");
+
+        let sourcesHtml = "";
+        if (d.sources && d.sources.length > 0) {
+          sourcesHtml = d.sources.map(s => `
+            <div class="border-b border-[#1c1c24] pb-1">
+              <a href="${s.url}" target="_blank" class="text-red-400 hover:underline font-bold">${s.title}</a>
+              <div class="text-[9px] text-neutral-400">${s.snippet}</div>
+            </div>
+          `).join("");
+        } else {
+          sourcesHtml = '<div class="text-neutral-500">Tidak ada artikel klarifikasi resmi yang cocok.</div>';
+        }
+
+        resultBox.innerHTML = `
+          <div class="flex items-center justify-between border-b border-[#1c1c24] pb-1.5 font-mono">
+            <span class="text-neutral-400">Vonis Forensik:</span>
+            <span class="font-extrabold text-[#ff2a2a]">${d.verdict} (${d.risk_score})</span>
+          </div>
+          <div class="flex gap-1 py-1">${indicators}</div>
+          <div class="text-neutral-200 font-mono leading-relaxed bg-[#0e0e14] p-2 rounded border border-[#1c1c24]">
+            ${d.deepseek_evaluation}
+          </div>
+          <div class="pt-1.5 space-y-1 font-mono text-[10px]">
+            <span class="text-neutral-400 uppercase font-bold">Rujukan Fakta Internet Terkait:</span>
+            ${sourcesHtml}
+          </div>
+        `;
+      })
+      .catch(err => {
+        btn.disabled = false;
+        statusLabel.innerText = "ERROR";
+        resultBox.innerHTML = `<span class="text-red-400 font-mono">Gagal menghubungi API: ${err}</span>`;
+      });
+    }
+
+    /* -----------------------------------------------------------
+     * 10. APP INITIALIZATION & DATA FETCHING
+     * ----------------------------------------------------------- */
+    function initApp() {
+      // 1. Fetch Live Trends untuk Hero Carousel Slide A
+      fetch("/api/live-trends")
+        .then(res => res.json())
+        .then(trends => {
+          liveTrendsData = trends;
+          if (trends && trends.length > 0) {
+            const first = trends[0];
+            currentSlideTarget = first.topic || "#PilkadaSerentak2024";
+            document.getElementById("slide-hashtag").innerText = first.topic;
+            document.getElementById("slide-headline").innerText = first.headline;
+            document.getElementById("slide-source").innerText = `${first.source} // Feed`;
+            document.getElementById("slide-timestamp").innerText = `Terbit: ${first.published}`;
+          }
+        })
+        .catch(err => console.warn("Live trends err:", err));
+
+      // 2. Fetch Sentiment Trends Harian
+      changeTimeRange("harian");
+
+      // 3. Fetch Hoax Feed
+      loadHoaxFeed();
+
+      // 4. Start Particle Canvas & Auto Carousel
+      resizeParticleCanvas();
+      drawParticleScan();
+      startCarouselTimer();
+
+      // 5. Inisialisasi awal SNA dummy/preview
+      initDefaultSNAGraph();
+    }
+
+    function initDefaultSNAGraph() {
+      const defaultGraph = {
+        nodes: [
+          { id: "@lead_hub_ops", display_name: "★ [DALANG] Pusat Komando Siber #A", group: "bot", score: 98, radius: 14, is_dalang: true, platform: "Twitter / X", umur_akun_hari: 1, waktu_posting: "Aktif Serentak", alasan_deteksi: "SIMPUL SENTRAL: Duplikasi narasi verbatim massal (sim=94%)", sample_post: "Narasi target terkoordinasi disebar serentak." },
+          { id: "@proxy_brigade_1", display_name: "Proxy Cluster Satelit 1", group: "bot", score: 86, radius: 8, is_dalang: false, platform: "TikTok Komentar", umur_akun_hari: 2, waktu_posting: "Terdeteksi aktif serentak", alasan_deteksi: "Sub-node satelit terhubung ke dalang @lead_hub_ops", sample_post: "Amplifikasi komentar serentak." },
+          { id: "@proxy_brigade_2", display_name: "Proxy Cluster Satelit 2", group: "bot", score: 84, radius: 8, is_dalang: false, platform: "Twitter / X", umur_akun_hari: 3, waktu_posting: "Terdeteksi aktif serentak", alasan_deteksi: "Sub-node satelit terhubung ke dalang @lead_hub_ops", sample_post: "Retweet dan kutipan otomatis." },
+          { id: "@feeder_sub_3", display_name: "Feeder Astroturf 3", group: "bot", score: 82, radius: 7, is_dalang: false, platform: "Telegram Channel", umur_akun_hari: 2, waktu_posting: "Terdeteksi aktif serentak", alasan_deteksi: "Penerusan pesan massal tanpa jeda", sample_post: "Broadcast tautan provokatif." },
+          { id: "@opini_warga_id", display_name: "Warga Digital Jakarta", group: "organic", score: 18, radius: 5, is_dalang: false, platform: "Twitter / X", umur_akun_hari: 420, waktu_posting: "15 menit lalu", alasan_deteksi: "Pola interaksi wajar organik", sample_post: "Mari jaga suasana kondusif menjelang pilkada." },
+          { id: "@media_pemerhati", display_name: "Pemerhati Demokrasi RI", group: "organic", score: 12, radius: 5, is_dalang: false, platform: "Twitter / X", umur_akun_hari: 610, waktu_posting: "30 menit lalu", alasan_deteksi: "Kredibilitas terverifikasi wajar", sample_post: "Data transparansi sangat penting bagi publik." }
+        ],
+        links: [
+          { source: "@lead_hub_ops", target: "@proxy_brigade_1", weight: 0.95 },
+          { source: "@lead_hub_ops", target: "@proxy_brigade_2", weight: 0.90 },
+          { source: "@lead_hub_ops", target: "@feeder_sub_3", weight: 0.85 },
+          { source: "@proxy_brigade_1", target: "@proxy_brigade_2", weight: 0.65 },
+          { source: "@proxy_brigade_2", target: "@opini_warga_id", weight: 0.20 },
+          { source: "@opini_warga_id", target: "@media_pemerhati", weight: 0.35 }
+        ]
+      };
+      renderD3Graph(defaultGraph);
+      selectNode(defaultGraph.nodes[0]);
+    }
+  </script>
+</body>
+</html>
