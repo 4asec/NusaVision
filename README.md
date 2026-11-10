@@ -1,8 +1,14 @@
+<p align="center">
+  <img src="backend/assets/logo-full.svg" alt="NusaVision Cognitive Domain Radar" width="460">
+</p>
+
 # 🛡️ NusaVision — Cognitive Domain Radar
 ### Platform Intelijen Siber Sosial & Analisis Opini Publik Berbasis Multi-Agent AI
 **Kategori:** Siber Sosial (Social Cyber Defense)  
 **Kompetisi:** Kartika Cyber Hackathon 2026  
-**Status:** Production Ready • v1.0.0  
+**Status:** Production Ready • v1.1.0  
+
+> **Emblem Filosofi:** Monogram **NV** berkepala elang dengan paruh melengkung tajam (`#E10600` Crimson Red & `#FFFFFF`) melambangkan kecepatan jelajah sensor kognitif, ketajaman identifikasi jaringan buzzer/botnet, dan keunggulan taktis intelijen siber pertahanan nasional.
 
 ---
 

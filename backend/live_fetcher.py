@@ -3,7 +3,10 @@ import urllib.parse
 from datetime import datetime, timedelta
 import feedparser
 from bs4 import BeautifulSoup
-from ddgs import DDGS
+try:
+    from duckduckgo_search import DDGS
+except ImportError:
+    from ddgs import DDGS
 
 def get_live_trending_topics():
     """Mengambil 5 isu/berita paling hangat di Indonesia secara real-time via RSS."""

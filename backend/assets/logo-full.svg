@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1580 512" fill="none">
+  <!-- Ikon Monogram NV dengan Paruh Elang Melengkung di Kanan Atas V (0 0 512 512) -->
+  <g transform="translate(256, 256) skewX(-12) translate(-256, -256)">
+    <path fill="#E10600" d="M 56 384 L 56 128 L 114 128 L 210 286 L 210 128 L 266 128 L 266 384 L 208 384 L 112 226 L 112 384 Z" />
+    <path fill="#FFFFFF" d="M 266 128 L 324 128 L 352 276 L 386 164 C 398 128 438 118 476 136 C 492 145 496 172 480 198 C 472 176 454 170 436 178 L 376 384 L 322 384 L 266 226 Z" />
+    <polygon fill="#E10600" points="410,152 436,148 428,164 404,164" />
+  </g>
+  <!-- Wordmark NusaVision Sans-Serif Tegas -->
+  <text x="548" y="318" fill="#FFFFFF" font-family="Inter, system-ui, -apple-system, sans-serif" font-weight="800" font-size="182" letter-spacing="-3">NusaVision</text>
+</svg>

@@ -3,6 +3,7 @@ import json
 from fastapi import FastAPI, HTTPException, Query, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse, JSONResponse, PlainTextResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from live_fetcher import get_live_trending_topics, cari_fakta_rujukan
@@ -23,6 +24,17 @@ app.add_middleware(
 def home():
     index_path = os.path.join(os.path.dirname(__file__), "index.html")
     return FileResponse(index_path)
+
+@app.get("/favicon.ico")
+def favicon():
+    icon_path = os.path.join(os.path.dirname(__file__), "assets", "logo-icon.svg")
+    if os.path.exists(icon_path):
+        return FileResponse(icon_path, media_type="image/svg+xml")
+    return Response(status_code=204)
+
+assets_dir = os.path.join(os.path.dirname(__file__), "assets")
+if os.path.exists(assets_dir):
+    app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
 
 # Ingestion Trending Topics Aktual
 @app.get("/api/live-trends")
