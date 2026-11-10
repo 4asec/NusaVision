@@ -6,27 +6,34 @@
   <title>NusaVision // Cognitive Domain Radar</title>
   <link rel="icon" type="image/svg+xml" href="/assets/logo-icon.svg">
   <link rel="alternate icon" href="/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <style>
-    /* SATU FONT KONSISTEN DI SELURUH HALAMAN: 'Courier New', Courier, monospace */
     * {
-      font-family: 'Courier New', Courier, monospace !important;
       box-sizing: border-box;
     }
 
-    /* Pertahankan font tegas sans-serif khusus untuk wordmark SVG Logo NusaVision */
-    svg text {
-      font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
-    }
-
     body {
-      background-color: #040406;
-      color: #e6edf3;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #06070a;
+      color: #e2e8f0;
       margin: 0;
       overflow-x: hidden;
-      selection-background-color: #ff2a2a;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .font-mono, code, pre, .tech-data {
+      font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+    }
+
+    /* Wordmark SVG Logo NusaVision */
+    svg text {
+      font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif !important;
     }
 
     ::selection {
@@ -52,6 +59,30 @@
 
     /* Efek Glow & Shadow Siber */
     .glow-red {
+      box-shadow: 0 0 24px rgba(225, 6, 0, 0.35);
+    }
+    .card-modern {
+      background: rgba(12, 13, 20, 0.85);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .card-modern:hover {
+      border-color: rgba(225, 6, 0, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(225, 6, 0, 0.15);
+    }
+    .pill-badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
       box-shadow: 0 0 20px rgba(255, 42, 42, 0.4);
     }
     .glow-red-sm {
@@ -61,16 +92,20 @@
       box-shadow: 0 0 12px rgba(16, 185, 129, 0.35);
     }
 
-    /* Canvas Latar Belakang Matrix Rain */
-    #matrixCanvas {
+    /* Ambient Modern Background (No AI-slop Matrix Rain) */
+    .ambient-glow {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
       z-index: -2;
-      opacity: 0.18;
       pointer-events: none;
+      background: 
+        radial-gradient(circle at 50% 0%, rgba(225, 6, 0, 0.08) 0%, transparent 60%),
+        radial-gradient(circle at 85% 30%, rgba(225, 6, 0, 0.03) 0%, transparent 45%),
+        radial-gradient(circle at 15% 70%, rgba(225, 6, 0, 0.02) 0%, transparent 50%),
+        #06070a;
     }
 
     /* Preloader Fullscreen */
@@ -175,8 +210,8 @@
     </div>
   </div>
 
-  <!-- Background Matrix Rain Canvas -->
-  <canvas id="matrixCanvas"></canvas>
+  <!-- Ambient Background Surface -->
+  <div class="ambient-glow"></div>
 
   <!-- ======================================================== -->
   <!-- STICKY NAVBAR ATAS (DENGAN INTERSECTION OBSERVER LOGO)   -->
@@ -204,39 +239,12 @@
         </div>
       </a>
 
-      <!-- Desktop Nav Quick Links -->
-      <nav class="hidden md:flex items-center gap-6 text-xs text-neutral-400">
-        <a href="#hero-section" class="nav-link hover:text-white transition tracking-wider flex items-center gap-1.5">
-          <span class="text-[#ff2a2a] text-[10px]">01.</span> Beranda
-        </a>
-        <a href="#sentiment-section" class="nav-link hover:text-white transition tracking-wider flex items-center gap-1.5">
-          <span class="text-[#ff2a2a] text-[10px]">02.</span> Sentimen & Radar
-        </a>
-        <a href="#sna-section" class="nav-link hover:text-white transition tracking-wider flex items-center gap-1.5">
-          <span class="text-[#ff2a2a] text-[10px]">03.</span> SNA & Satgas AI
-        </a>
-        <a href="#hoax-section" class="nav-link hover:text-white transition tracking-wider flex items-center gap-1.5">
-          <span class="text-[#ff2a2a] text-[10px]">04.</span> Hoax Classifier
-        </a>
-      </nav>
-
-      <!-- Right Header Actions (Status Pill + Hamburger Button SVG) -->
-      <div class="flex items-center gap-3">
-        <div class="hidden sm:flex items-center gap-2 bg-[#0e0e14] border border-[#1c1c24] px-2.5 py-1 rounded text-[10px]">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span class="text-neutral-300 font-bold">ONLINE</span>
-          <span class="text-neutral-400">|</span>
-          <span class="text-neutral-400 font-mono">PORT: 8080</span>
-        </div>
-
-        <!-- Tombol Hamburger Kanan (Custom Inline SVG, Tanpa Emoji) -->
-        <button id="btn-hamburger" onclick="toggleNavDrawer()" aria-label="Buka Menu Navigasi" class="w-9 h-9 flex items-center justify-center rounded bg-[#0e0e14] border border-[#1c1c24] hover:border-[#ff2a2a] text-neutral-300 hover:text-white transition glow-red-sm">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-          </svg>
-        </button>
-      </div>
-
+      <!-- Tombol Hamburger Kanan (Custom Inline SVG, Tanpa Emoji) -->
+      <button id="btn-hamburger" onclick="toggleNavDrawer()" aria-label="Buka Menu Navigasi" class="w-10 h-10 flex items-center justify-center rounded-xl bg-[#0c0d14] border border-white/10 hover:border-[#ff2a2a] text-neutral-300 hover:text-white transition duration-300 glow-red-sm shadow-lg">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+        </svg>
+      </button>
     </div>
   </header>
 
@@ -1178,40 +1186,7 @@
       advancePreloader();
     });
 
-    /* -----------------------------------------------------------
-     * 2. MATRIX RAIN BACKGROUND (CANVAS)
-     * ----------------------------------------------------------- */
-    const matrixCanvas = document.getElementById("matrixCanvas");
-    const mCtx = matrixCanvas.getContext("2d");
-    function resizeMatrixCanvas() {
-      matrixCanvas.width = window.innerWidth;
-      matrixCanvas.height = window.innerHeight;
-    }
-    resizeMatrixCanvas();
-    window.addEventListener("resize", resizeMatrixCanvas);
-
-    const matrixChars = ["0", "1", "x", "f", "9", "a", "c", "d"];
-    const mFontSize = 15;
-    let mColumns = Math.floor(matrixCanvas.width / mFontSize);
-    let mDrops = [];
-    for (let i = 0; i < mColumns; i++) mDrops[i] = Math.random() * -100;
-
-    function drawMatrixRain() {
-      mCtx.fillStyle = "rgba(4, 4, 6, 0.08)";
-      mCtx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
-      mCtx.fillStyle = "#ff1a1a";
-      mCtx.font = mFontSize + "px 'Courier New', Courier, monospace";
-
-      for (let i = 0; i < mDrops.length; i++) {
-        const text = matrixChars[Math.floor(Math.random() * matrixChars.length)];
-        mCtx.fillText(text, i * mFontSize, mDrops[i] * mFontSize);
-        if (mDrops[i] * mFontSize > matrixCanvas.height && Math.random() > 0.98) {
-          mDrops[i] = 0;
-        }
-        mDrops[i]++;
-      }
-    }
-    setInterval(drawMatrixRain, 40);
+    /* Matrix Rain removed for clean, minimalist, humanized aesthetic */
 
     /* -----------------------------------------------------------
      * 3. STICKY NAV & INTERSECTION OBSERVER FOR MINI LOGO
@@ -1454,18 +1429,18 @@
               borderColor: "#1c1c24",
               borderWidth: 1,
               padding: 10,
-              titleFont: { family: "'Courier New', Courier, monospace", weight: 'bold' },
-              bodyFont: { family: "'Courier New', Courier, monospace" }
+              titleFont: { family: "'Plus Jakarta Sans', sans-serif", weight: 'bold' },
+              bodyFont: { family: "'JetBrains Mono', monospace" }
             }
           },
           scales: {
             x: {
               grid: { color: "#1c1c24" },
-              ticks: { color: "#737373", font: { family: "'Courier New', Courier, monospace", size: 10 } }
+              ticks: { color: "#737373", font: { family: "'JetBrains Mono', monospace", size: 10 } }
             },
             y: {
               grid: { color: "#1c1c24" },
-              ticks: { color: "#737373", font: { family: "'Courier New', Courier, monospace", size: 10 } }
+              ticks: { color: "#737373", font: { family: "'JetBrains Mono', monospace", size: 10 } }
             }
           }
         }
