@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NusaVision // Deck Presentasi Kartika Cyber Hackathon 2026</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/logo-icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,600;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background-color: #06070a;
+      color: #f1f5f9;
+      margin: 0;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+    .font-serif-italic {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-style: italic;
+    }
+    .font-mono-tech {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    
+    /* Background Ambient & Radar Glow */
+    .ambient-grid {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(225, 6, 0, 0.12) 0%, transparent 55%),
+        radial-gradient(circle at 85% 30%, rgba(225, 6, 0, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 15% 70%, rgba(225, 6, 0, 0.04) 0%, transparent 50%),
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 100% 100%, 48px 48px, 48px 48px;
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    /* Glassmorphism Card Modern */
+    .glass-card {
+      background: rgba(12, 14, 22, 0.85);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+      transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .glass-card:hover {
+      border-color: rgba(225, 6, 0, 0.4);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(225, 6, 0, 0.15);
+    }
+    .glass-card-active {
+      background: rgba(35, 10, 14, 0.7);
+      border: 1px solid rgba(225, 6, 0, 0.6);
+      box-shadow: 0 0 24px rgba(225, 6, 0, 0.25);
+    }
+    
+    /* Slide Animation */
+    .slide-content {
+      opacity: 0;
+      transform: translateY(18px) scale(0.99);
+      transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1), transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+      display: none;
+    }
+    .slide-content.active {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      display: flex;
+    }
+
+    /* Red Glow */
+    .glow-red {
+      box-shadow: 0 0 25px rgba(225, 6, 0, 0.45);
+    }
+    .glow-red-sm {
+      box-shadow: 0 0 12px rgba(225, 6, 0, 0.3);
+    }
+
+    /* Custom Scrollbar for Notes */
+    ::-webkit-scrollbar {
+      width: 5px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="bg-[#06070a] text-slate-100 flex flex-col justify-between relative select-none">
+
+  <!-- Ambient Grid Background -->
+  <div class="ambient-grid"></div>
+
+  <!-- TOP BAR: PROGRESS BAR & METADATA -->
+  <header class="relative z-20 px-6 py-3.5 border-b border-white/[0.06] bg-[#06070a]/90 backdrop-blur-md flex items-center justify-between">
+    <!-- Top Progress Line -->
+    <div class="absolute top-0 left-0 right-0 h-1 bg-neutral-900 overflow-hidden">
+      <div id="progressBar" class="h-full bg-gradient-to-r from-red-800 via-[#E10600] to-red-500 transition-all duration-300 w-[8.33%] glow-red-sm"></div>
+    </div>
+
+    <!-- Left: Brand Monogram & Title -->
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg border border-[#E10600]/80 bg-red-950/40 p-1 flex items-center justify-center glow-red-sm">
+        <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+          <g transform="translate(256, 256) skewX(-12) translate(-256, -256)">
+            <path fill="#E10600" d="M 56 384 L 56 128 L 114 128 L 210 286 L 210 128 L 266 128 L 266 384 L 208 384 L 112 226 L 112 384 Z" />
+            <path fill="#FFFFFF" d="M 266 128 L 324 128 L 352 276 L 386 164 C 398 128 438 118 476 136 C 492 145 496 172 480 198 C 472 176 454 170 436 178 L 376 384 L 322 384 L 266 226 Z" />
+            <polygon fill="#E10600" points="410,152 436,148 428,164 404,164" />
+          </g>
+        </svg>
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-black tracking-wider uppercase text-white">NusaVision</span>
+          <span class="text-[9px] bg-red-950 text-red-400 border border-red-900/80 px-2 py-0.5 rounded font-mono-tech font-bold">PUSSIBERAD TNI AD</span>
+        </div>
+        <div class="text-[10px] text-neutral-400 tracking-tight">KARTIKA CYBER HACKATHON 2026 // SIBER SOSIAL</div>
+      </div>
+    </div>
+
+    <!-- Center: Section Indicator -->
+    <div id="slideSectionTitle" class="hidden md:flex items-center gap-2 text-xs font-semibold text-neutral-300">
+      <span class="w-2 h-2 rounded-full bg-[#E10600] animate-pulse"></span>
+      <span id="currentSectionName">01 • Cover Solusi</span>
+    </div>
+
+    <!-- Right: Quick Status -->
+    <div class="flex items-center gap-3 text-xs">
+      <span class="font-mono-tech text-neutral-400 text-[11px]"><span id="slideCounterText" class="text-white font-bold">01</span> / 12</span>
+      <button onclick="toggleSpeakerNotes()" id="btnToggleNotes" class="px-2.5 py-1 rounded-lg bg-neutral-900 hover:bg-neutral-800 border border-white/10 text-neutral-300 hover:text-white transition flex items-center gap-1.5 text-xs font-medium">
+        <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
+        <span>Notes (N)</span>
+      </button>
+      <button onclick="toggleFullscreen()" class="p-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 border border-white/10 text-neutral-400 hover:text-white transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN SLIDES STAGE CONTAINER (16:9 PROPORTIONED STAGE) -->
+  <main class="relative z-10 flex-1 flex items-center justify-center p-4 md:p-8 overflow-hidden">
+    <div class="w-full max-w-6xl aspect-[16/9] flex flex-col justify-center relative">
+
+      <!-- ========================================== -->
+      <!-- SLIDE 1: COVER                             -->
+      <!-- ========================================== -->
+      <section id="slide-1" class="slide-content active flex-col justify-between h-full p-8 md:p-12 glass-card border-[#E10600]/30 glow-red-sm relative overflow-hidden">
+        <div class="flex items-center justify-between">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-950/50 border border-red-900/80 text-red-400 text-xs font-semibold uppercase tracking-wider">
+            <span class="w-2 h-2 rounded-full bg-[#E10600] animate-ping"></span>
+            <span>KARTIKA CYBER HACKATHON 2026 // PUSSIBERAD</span>
+          </div>
+          <span class="text-xs font-mono-tech text-neutral-400 tracking-wider">KATEGORI: SIBER SOSIAL</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center my-auto">
+          <div class="md:col-span-8 space-y-4">
+            <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight text-white leading-none">
+              <span class="font-serif-italic font-normal text-red-500 mr-2">Intelijen</span>NUSAVISION
+            </h1>
+            <p class="text-lg md:text-xl font-bold tracking-tight text-red-400 uppercase font-mono-tech">
+              Cognitive Domain Defense Radar
+            </p>
+            <p class="text-sm md:text-base text-neutral-300 leading-relaxed max-w-2xl">
+              Sistem Pertahanan Siber Sosial Mandiri Berbasis Hierarki Multi-Agent Otonom & Model Reasoning Komputasional Lokal (DeepSeek-R1 Offline).
+            </p>
+          </div>
+          <div class="md:col-span-4 flex items-center justify-center">
+            <div class="w-44 h-44 md:w-56 md:h-56 p-4 rounded-2xl border border-white/10 bg-gradient-to-b from-[#161824] to-black flex items-center justify-center glow-red">
+              <svg class="w-full h-full drop-shadow-[0_0_30px_rgba(225,6,0,0.8)]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+                <g transform="translate(256, 256) skewX(-12) translate(-256, -256)">
+                  <path fill="#E10600" d="M 56 384 L 56 128 L 114 128 L 210 286 L 210 128 L 266 128 L 266 384 L 208 384 L 112 226 L 112 384 Z" />
+                  <path fill="#FFFFFF" d="M 266 128 L 324 128 L 352 276 L 386 164 C 398 128 438 118 476 136 C 492 145 496 172 480 198 C 472 176 454 170 436 178 L 376 384 L 322 384 L 266 226 Z" />
+                  <polygon fill="#E10600" points="410,152 436,148 428,164 404,164" />
+                </g>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between border-t border-white/10 pt-4 text-xs text-neutral-400 font-mono-tech">
+          <div>KERANGKA: MULTI-AGENT REACT + DEEPSEEK-R1</div>
+          <div class="text-red-400 font-bold">"SATRIA YUDHA WASKITA"</div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SLIDE 2: ALUR PAPARAN                      -->
+      <!-- ========================================== -->
+      <section id="slide-2" class="slide-content flex-col justify-between h-full p-8 md:p-12 glass-card">
+        <div>
+          <span class="text-xs font-bold text-red-500 uppercase tracking-widest font-mono-tech">// AGENDA OPERASI</span>
+          <h2 class="text-3xl md:text-4xl font-extrabold text-white mt-1">
+            <span class="font-serif-italic font-normal text-red-500 mr-2">Alur</span>Paparan Strategis
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 my-auto">
+          <div class="p-6 rounded-xl border border-white/10 bg-black/40 space-y-3">
+            <div class="text-2xl font-black text-red-500 font-mono-tech">01.</div>
+            <h3 class="text-lg font-bold text-white">Medan Tempur Kognitif</h3>
+            <p class="text-xs text-neutral-400 leading-relaxed">
+              Pergeseran ancaman siber sosial, doktrin Cognitive Warfare, dan urgensi perlindungan opini publik TNI AD.
+            </p>
+          </div>
+          <div class="p-6 rounded-xl border border-[#E10600]/40 bg-red-950/20 space-y-3">
+            <div class="text-2xl font-black text-red-400 font-mono-tech">02.</div>
+            <h3 class="text-lg font-bold text-white">Arsitektur & Purwarupa</h3>
+            <p class="text-xs text-neutral-400 leading-relaxed">
+              Hierarki 5 Multi-Agent AI, graf rimbun SNA D3.js, dan penalaran faktual model DeepSeek-R1 lokal.
+            </p>
+          </div>
+          <div class="p-6 rounded-xl border border-white/10 bg-black/40 space-y-3">
+            <div class="text-2xl font-black text-neutral-400 font-mono-tech">03.</div>
+            <h3 class="text-lg font-bold text-white">Nilai Taktis & Roadmap</h3>
+            <p class="text-xs text-neutral-400 leading-relaxed">
+              Kedaulatan data militer on-premise, zero cloud leakage, dan rencana integrasi operasional di satuan.
+            </p>
+          </div>
+        </div>
+
+        <div class="text-xs text-neutral-400 font-mono-tech border-t border-white/10 pt-3 flex justify-between">
+          <span>DURASI PRESENTASI: 5 MENIT</span>
+          <span>HACKATHON TRACK: COGNITIVE DEFENSE</span>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SLIDE 3: MEDAN TEMPUR KOGNITIF             -->
+      <!-- ========================================== -->
+      <section id="slide-3" class="slide-content flex-col justify-between h-full p-8 md:p-12 glass-card">
+        <div>
+          <span class="text-xs font-bold text-red-500 uppercase tracking-widest font-mono-tech">// DOKTRIN PERTAHANAN</span>
+          <h2 class="text-3xl md:text-4xl font-extrabold text-white mt-1">
+            <span class="font-serif-italic font-normal text-red-500 mr-2">Medan Tempur</span>Kelima: Cognitive Warfare
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 my-auto">
+          <div class="p-5 rounded-xl border border-red-900/60 bg-red-950/20 space-y-2.5">
+            <div class="w-8 h-8 rounded-lg bg-red-900/50 flex items-center justify-center text-red-400">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+            </div>
+            <h3 class="text-sm font-bold text-white uppercase">Weaponized Narrative</h3>
+            <p class="text-xs text-neutral-300 leading-relaxed">
+              Disinformasi terstruktur disuntikkan secara serentak untuk merusak kohesi sosial dan memicu polarisasi horizontal.
+            </p>
+          </div>
+          <div class="p-5 rounded-xl border border-white/10 bg-black/40 space-y-2.5">
+            <div class="w-8 h-8 rounded-lg bg-neutral-800 flex items-center justify-center text-neutral-300">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg>
+            </div>
+            <h3 class="text-sm font-bold text-white uppercase">Computational Propaganda</h3>
+            <p class="text-xs text-neutral-300 leading-relaxed">
+              Pasukan botnet terdistribusi mengamplifikasi opini palsu guna merekayasa konsensus masyarakat semu.
+            </p>
+          </div>
+          <div class="p-5 rounded-xl border border-white/10 bg-black/40 space-y-2.5">
+            <div class="w-8 h-8 rounded-lg bg-neutral-800 flex items-center justify-center text-neutral-300">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+            </div>
+            <h3 class="text-sm font-bold text-white uppercase">Stabilitas Pertahanan</h3>
+            <p class="text-xs text-neutral-300 leading-relaxed">
+              Serangan persepsi berdaya rusak setara senjata kinetik bila tidak diintersepsi secara dini oleh komando intelijen.
+            </p>
+          </div>
+        </div>
+
+        <div class="p-3 bg-red-950/30 border border-red-900/60 rounded-xl text-xs text-neutral-300 flex items-center justify-between font-mono-tech">
+          <span>PARADIGMA BARU: MEMPERTAHANKAN KEDAULATAN KOGNITIF BANGSA</span>
+          <span class="text-red-400 font-bold">URGENT</span>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SLIDE 4: TIGA MASALAH KRITIS               -->
+      <!-- ========================================== -->
+      <section id="slide-4" class="slide-content flex-col justify-between h-full p-8 md:p-12 glass-card">
+        <div>
+          <span class="text-xs font-bold text-red-500 uppercase tracking-widest font-mono-tech">// GAP OPERASIONAL</span>
+          <h2 class="text-3xl md:text-4xl font-extrabold text-white mt-1">
+            <span class="font-serif-italic font-normal text-red-500 mr-2">Tiga Masalah</span>Kritis di Lapangan
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 my-auto">
+          <div class="p-6 rounded-xl border border-white/10 bg-black/50 space-y-3">
+            <span class="text-xs font-bold px-2 py-0.5 rounded bg-red-950 text-red-400 border border-red-800 font-mono-tech">KRITIS 01</span>
+            <h3 class="text-base font-bold text-white">Deteksi Terlambat</h3>
+            <p class="text-xs text-neutral-400 leading-relaxed">
+              Analisis manual butuh 6–12 jam; narasi provokatif telah menembus jutaan impresi publik sebelum sempat ditangkal.
+            </p>
+          </div>
+          <div class="p-6 rounded-xl border border-white/10 bg-black/50 space-y-3">
+            <span class="text-xs font-bold px-2 py-0.5 rounded bg-red-950 text-red-400 border border-red-800 font-mono-tech">KRITIS 02</span>
+            <h3 class="text-base font-bold text-white">Kamuflase Botnet</h3>
+            <p class="text-xs text-neutral-400 leading-relaxed">
+              Buzzer modern menggunakan akun kloning terdistribusi dan posting acak sehingga luput dari filter analitik konvensional.
+            </p>
+          </div>
+          <div class="p-6 rounded-xl border border-white/10 bg-black/50 space-y-3">
+            <span class="text-xs font-bold px-2 py-0.5 rounded bg-amber-950 text-amber-400 border border-amber-800 font-mono-tech">KRITIS 03</span>
+            <h3 class="text-base font-bold text-white">Risiko Cloud Asing</h3>
+            <p class="text-xs text-neutral-400 leading-relaxed">
+              Mengirim data percakapan intelijen ke API komersial luar negeri melanggar kerahasiaan data strategis militer.
+            </p>
+          </div>
+        </div>
+
+        <div class="text-xs text-neutral-400 font-mono-tech border-t border-white/10 pt-3">
+          KESIMPULAN: DIBUTUHKAN SISTEM RADAR OTOMATIS BERKECEPATAN TINGGI & 100% MANDIRI
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SLIDE 5: SOLUSI NUSAVISION                 -->
+      <!-- ========================================== -->
+      <section id="slide-5" class="slide-content flex-col justify-between h-full p-8 md:p-12 glass-card">
+        <div>
+          <span class="text-xs font-bold text-red-500 uppercase tracking-widest font-mono-tech">// JAWABAN TEKNOLOGI</span>
+          <h2 class="text-3xl md:text-4xl font-extrabold text-white mt-1">
+            <span class="font-serif-italic font-normal text-red-500 mr-2">Solusi:</span>Platform Terpadu NusaVision
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 my-auto">
+          <div class="p-5 rounded-xl border border-white/10 bg-black/40 space-y-2">
+            <div class="text-red-500 font-black font-mono-tech text-lg">01</div>
+            <h3 class="text-sm font-bold text-white">Anomaly Scout</h3>
+            <p class="text-[11px] text-neutral-400 leading-relaxed">
+              Deteksi lonjakan volume transmisi per detik memilah anomali organik vs terorkestrasi.
+            </p>
+          </div>
+          <div class="p-5 rounded-xl border border-white/10 bg-black/40 space-y-2">
+            <div class="text-red-500 font-black font-mono-tech text-lg">02</div>
+            <h3 class="text-sm font-bold text-white">Dense SNA Graph</h3>
+            <p class="text-[11px] text-neutral-400 leading-relaxed">
+              Topologi graf rimbun interaktif mengunci simpul dalang utama (central coordinator).
+            </p>
+          </div>
+          <div class="p-5 rounded-xl border border-white/10 bg-black/40 space-y-2">
+            <div class="text-red-500 font-black font-mono-tech text-lg">03</div>
+            <h3 class="text-sm font-bold text-white">Dual-Mode Hoax</h3>
+            <p class="text-[11px] text-neutral-400 leading-relaxed">
+              Pemeriksaan klaim viral & verifikasi silang pangkalan data RAG periksa fakta nasional.
+            </p>
+          </div>
+          <div class="p-5 rounded-xl border border-white/10 bg-black/40 space-y-2">
+            <div class="text-red-500 font-black font-mono-tech text-lg">04</div>
+            <h3 class="text-sm font-bold text-white">ReAct Multi-Agent</h3>
+            <p class="text-[11px] text-neutral-400 leading-relaxed">
+              Orkestrasi mandiri berantai menerbitkan berkas audit forensik tervalidasi secara otonom.
+            </p>
+          </div>
+        </div>
+
+        <div class="p-3 rounded-lg bg-neutral-900 border border-white/10 flex items-center justify-between text-xs font-mono-tech">
+          <span class="text-neutral-300">INTEGRASI LENGKAP: INGESTION ➔ HEURISTIK ➔ REASONING ➔ AUDIT</span>
+          <span class="text-emerald-400 font-bold">ALL-IN-ONE</span>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SLIDE 6: ARSITEKTUR MULTI-AGENT            -->
+      <!-- ========================================== -->
+      <section id="slide-6" class="slide-content flex-col justify-between h-full p-8 md:p-12 glass-card">
+        <div>
+          <span class="text-xs font-bold text-red-500 uppercase tracking-widest font-mono-tech">// ORKESTRASI SISTEM</span>
+          <h2 class="text-3xl md:text-4xl font-extrabold text-white mt-1">
+            <span class="font-serif-italic font-normal text-red-500 mr-2">Hierarki</span>Satgas Multi-Agent Otonom
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-3 my-auto text-center">
+          <div class="p-4 rounded-xl border border-red-900/80 bg-red-950/30 space-y-2">
+            <span class="text-[10px] text-red-400 font-mono-tech font-bold">KOMANDAN</span>
+            <h3 class="text-xs font-extrabold text-white">Boss AI</h3>
+            <p class="text-[10px] text-neutral-400 leading-tight">Rumuskan strategi & delegasi sasaran operasi</p>
+          </div>
+          <div class="p-4 rounded-xl border border-white/10 bg-black/50 space-y-2">
+            <span class="text-[10px] text-neutral-400 font-mono-tech">ANALIS 01</span>
+            <h3 class="text-xs font-extrabold text-white">Early Warning</h3>
+            <p class="text-[10px] text-neutral-400 leading-tight">Ukur kecepatan transmisi lonjakan narasi</p>
+          </div>
+          <div class="p-4 rounded-xl border border-white/10 bg-black/50 space-y-2">
+            <span class="text-[10px] text-neutral-400 font-mono-tech">ANALIS 02</span>
+            <h3 class="text-xs font-extrabold text-white">Reasoner</h3>
+            <p class="text-[10px] text-neutral-400 leading-tight">Polaritas sentimen & probabilitas fabrikasi</p>
+          </div>
+          <div class="p-4 rounded-xl border border-white/10 bg-black/50 space-y-2">
+            <span class="text-[10px] text-neutral-400 font-mono-tech">OPERATOR 03</span>
+            <h3 class="text-xs font-extrabold text-white">BotRadar SNA</h3>
+            <p class="text-[10px] text-neutral-400 leading-tight">Matriks graf rimbun & kunci dalang utama</p>
+          </div>
+          <div class="p-4 rounded-xl border border-emerald-900/80 bg-emerald-950/20 space-y-2">
+            <span class="text-[10px] text-emerald-400 font-mono-tech font-bold">AUDITOR 04</span>
+            <h3 class="text-xs font-extrabold text-white">Forensic PoC</h3>
+            <p class="text-[10px] text-neutral-400 leading-tight">Validasi silang & terbitkan berkas resmi</p>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between text-xs text-neutral-400 font-mono-tech border-t border-white/10 pt-3">
+          <span>PIPELINE: SERVER-SENT EVENTS (SSE) STREAMING REAL-TIME</span>
+          <span class="text-emerald-400">STATUS: OTONOM SIAGA</span>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SLIDE 7: FITUR 1: SENTIMEN & EARLY WARNING -->
+      <!-- ========================================== -->
+      <section id="slide-7" class="slide-content flex-col justify-between h-full p-8 md:p-12 glass-card">
+        <div>
+          <span class="text-xs font-bold text-red-500 uppercase tracking-widest font-mono-tech">// MODUL 01</span>
+          <h2 class="text-3xl md:text-4xl font-extrabold text-white mt-1">
+            <span class="font-serif-italic font-normal text-red-500 mr-2">Sentimen</span>& Radar Early Warning
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-auto items-center">
+          <div class="p-6 rounded-xl border border-white/10 bg-black/40 space-y-3">
+            <h3 class="text-base font-bold text-white">Dinamika Emosi Publik Multi-Series</h3>
+            <p class="text-xs text-neutral-300 leading-relaxed">
+              Memetakan tren emosi publik secara multi-series (Positif, Negatif, Netral) dalam rentang Harian, Mingguan, Bulanan, dan Tahunan.
+            </p>
+            <div class="flex gap-2 text-xs font-mono-tech">
+              <span class="px-2 py-1 bg-emerald-950 text-emerald-400 border border-emerald-800 rounded">Positif (Hijau)</span>
+              <span class="px-2 py-1 bg-red-950 text-red-400 border border-red-800 rounded">Negatif (Merah)</span>
+              <span class="px-2 py-1 bg-slate-900 text-slate-400 border border-slate-700 rounded">Netral (Abu-abu)</span>
+            </div>
+          </div>
+          <div class="p-6 rounded-xl border border-[#E10600]/40 bg-red-950/20 space-y-3">
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#E10600] animate-pulse"></span>
+              Algoritma Pemilah Lonjakan Agen 1
+            </h3>
+            <div class="space-y-2 text-xs">
+              <div class="p-2.5 rounded bg-black/60 border border-white/10 flex items-center justify-between">
+                <span class="text-neutral-300 font-bold">Natural / Organik</span>
+                <span class="text-emerald-400 font-mono-tech font-bold">Variasi Wajar</span>
+              </div>
+              <div class="p-2.5 rounded bg-red-950/60 border border-red-800 flex items-center justify-between">
+                <span class="text-red-200 font-bold">Terorkestrasi (Buzzer)</span>
+                <span class="text-red-400 font-mono-tech font-bold">>300%/Jam + Verbatim</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-xs text-neutral-400 font-mono-tech border-t border-white/10 pt-3">
+          MANFAAT: INTERSEPSI NARASI PROVOKATIF SEBELUM MELEDAK DI RUANG FISIK
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SLIDE 8: FITUR 2: SOCIAL NETWORK ANALYSIS  -->
+      <!-- ========================================== -->
+      <section id="slide-8" class="slide-content flex-col justify-between h-full p-8 md:p-12 glass-card">
+        <div>
+          <span class="text-xs font-bold text-red-500 uppercase tracking-widest font-mono-tech">// MODUL 02</span>
+          <h2 class="text-3xl md:text-4xl font-extrabold text-white mt-1">
+            <span class="font-serif-italic font-normal text-red-500 mr-2">Social Network</span>Analysis & Penguncian Dalang
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 my-auto">
+          <div class="p-5 rounded-xl border border-red-900/80 bg-red-950/30 space-y-2">
+            <h3 class="text-sm font-bold text-white uppercase">Isolasi Dalang Utama</h3>
+            <p class="text-xs text-neutral-300 leading-relaxed">
+              Algoritma sentralitas derajat mengidentifikasi dan mengunci simpul dalang utama (central coordinator) bersinar merah pada graf.
+            </p>
+          </div>
+          <div class="p-5 rounded-xl border border-white/10 bg-black/40 space-y-2">
+            <h3 class="text-sm font-bold text-white uppercase">Multi-Hop Traversal</h3>
+            <p class="text-xs text-neutral-300 leading-relaxed">
+              Pencarian username otomatis menyoroti jaringan afiliasi 1st & 2nd degree, meredupkan simpul acak yang tidak berhubungan.
+            </p>
+          </div>
+          <div class="p-5 rounded-xl border border-white/10 bg-black/40 space-y-2">
+            <h3 class="text-sm font-bold text-white uppercase">Profil Intelijen Akun</h3>
+            <p class="text-xs text-neutral-300 leading-relaxed">
+              Membedah skor probabilitas botnet, riwayat unggahan, umur akun, dan peringatan ancaman komando secara instan.
+            </p>
+          </div>
+        </div>
+
+        <div class="p-3 bg-black/60 rounded-xl border border-white/10 flex justify-between items-center text-xs font-mono-tech">
+          <span>ENGINE GRAF: D3.JS FORCE-DIRECTED PHYSICAL SIMULATION</span>
+          <span class="text-red-400 font-bold">AKURASI DETEKSI HUB: 98%</span>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SLIDE 9: FITUR 3: HOAX CLASSIFIER & RAG    -->
+      <!-- ========================================== -->
+      <section id="slide-9" class="slide-content flex-col justify-between h-full p-8 md:p-12 glass-card">
+        <div>
+          <span class="text-xs font-bold text-red-500 uppercase tracking-widest font-mono-tech">// MODUL 03</span>
+          <h2 class="text-3xl md:text-4xl font-extrabold text-white mt-1">
+            <span class="font-serif-italic font-normal text-red-500 mr-2">Dual-Mode</span>Hoax Classifier & RAG Fact Lab
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-auto">
+          <div class="p-5 rounded-xl border border-white/10 bg-black/40 space-y-2.5">
+            <span class="text-[10px] text-red-400 font-mono-tech font-bold uppercase">MODE 1 // REPOSITORI VIRAL</span>
+            <h3 class="text-base font-bold text-white">Monitoring Isu Terkini Lintas Medsos</h3>
+            <p class="text-xs text-neutral-300 leading-relaxed">
+              Pemantauan feed disinformasi viral lintas platform secara berkala, terintegrasi ke referensi cek fakta nasional (Kominfo, CekFakta, TurnBackHoax).
+            </p>
+          </div>
+          <div class="p-5 rounded-xl border border-red-900/60 bg-red-950/20 space-y-2.5">
+            <span class="text-[10px] text-red-400 font-mono-tech font-bold uppercase">MODE 2 // UJI FORENSIK BEBAS</span>
+            <h3 class="text-base font-bold text-white">Dekonstruksi Narasi via DeepSeek-R1</h3>
+            <p class="text-xs text-neutral-300 leading-relaxed">
+              Operator menguji teks klaim kustom; reasoning model mengurai rantai narasi, probabilitas fabrikasi, dan sumber klarifikasi rujukan.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-4 gap-2 text-center text-xs font-mono-tech">
+          <div class="p-2 bg-neutral-900 rounded border border-white/10">Skor Hoaks Total</div>
+          <div class="p-2 bg-neutral-900 rounded border border-white/10">Fabrikasi Narasi</div>
+          <div class="p-2 bg-neutral-900 rounded border border-white/10">Pola Penyebaran</div>
+          <div class="p-2 bg-neutral-900 rounded border border-white/10">Kredibilitas Sumber</div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SLIDE 10: KEDAULATAN DATA ON-PREMISE       -->
+      <!-- ========================================== -->
+      <section id="slide-10" class="slide-content flex-col justify-between h-full p-8 md:p-12 glass-card">
+        <div>
+          <span class="text-xs font-bold text-red-500 uppercase tracking-widest font-mono-tech">// KEDAULATAN TEKNOLOGI</span>
+          <h2 class="text-3xl md:text-4xl font-extrabold text-white mt-1">
+            <span class="font-serif-italic font-normal text-red-500 mr-2">Kedaulatan Data:</span>Zero Cloud Leakage
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 my-auto">
+          <div class="p-5 rounded-xl border border-white/10 bg-black/50 space-y-3">
+            <div class="text-red-500 font-mono-tech font-bold text-xs">[ON-PREMISE LOCAL]</div>
+            <h3 class="text-base font-bold text-white">100% Mandiri Offline</h3>
+            <p class="text-xs text-neutral-300 leading-relaxed">
+              Model penalaran `DeepSeek-R1:8b` berjalan langsung di server internal lokal tanpa ketergantungan koneksi internet luar.
+            </p>
+          </div>
+          <div class="p-5 rounded-xl border border-white/10 bg-black/50 space-y-3">
+            <div class="text-emerald-400 font-mono-tech font-bold text-xs">[ZERO VENDOR LEAK]</div>
+            <h3 class="text-base font-bold text-white">Nol Kebocoran Data</h3>
+            <p class="text-xs text-neutral-300 leading-relaxed">
+              Data target operasi dan narasi investigasi militer tidak pernah dikirim ke pihak ketiga atau server cloud asing.
+            </p>
+          </div>
+          <div class="p-5 rounded-xl border border-white/10 bg-black/50 space-y-3">
+            <div class="text-neutral-400 font-mono-tech font-bold text-xs">[ZERO OPEX TOKEN]</div>
+            <h3 class="text-base font-bold text-white">Biaya Operasional Nol</h3>
+            <p class="text-xs text-neutral-300 leading-relaxed">
+              Dibangun di atas fondasi Open-Source murni (FastAPI, Ollama, D3.js) tanpa biaya langganan API berbayar.
+            </p>
+          </div>
+        </div>
+
+        <div class="text-xs text-neutral-400 font-mono-tech border-t border-white/10 pt-3">
+          STANDAR KEAMANAN: MILITARY-GRADE PRIVACY & DATA SOVEREIGNTY COMPLIANT
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SLIDE 11: NILAI BAGI TNI AD / PUSSIBERAD   -->
+      <!-- ========================================== -->
+      <section id="slide-11" class="slide-content flex-col justify-between h-full p-8 md:p-12 glass-card">
+        <div>
+          <span class="text-xs font-bold text-red-500 uppercase tracking-widest font-mono-tech">// RELEVANSI STRATEGIS</span>
+          <h2 class="text-3xl md:text-4xl font-extrabold text-white mt-1">
+            <span class="font-serif-italic font-normal text-red-500 mr-2">Dampak Taktis</span>Bagi Satuan PUSSIBERAD
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-auto">
+          <div class="p-6 rounded-xl border border-white/10 bg-black/60 space-y-3">
+            <span class="text-xs font-bold text-neutral-400 font-mono-tech">METODE KONVENSIONAL</span>
+            <ul class="text-xs text-neutral-400 space-y-2">
+              <li class="flex items-center gap-2"><span class="text-red-500 font-bold">✕</span> Analisis manual memakan 8–12 jam kerja</li>
+              <li class="flex items-center gap-2"><span class="text-red-500 font-bold">✕</span> Laporan tercecer dalam spreadsheet statis</li>
+              <li class="flex items-center gap-2"><span class="text-red-500 font-bold">✕</span> Sulit membuktikan hubungan struktural dalang buzzer</li>
+            </ul>
+          </div>
+          <div class="p-6 rounded-xl border border-emerald-900/80 bg-emerald-950/20 space-y-3">
+            <span class="text-xs font-bold text-emerald-400 font-mono-tech">DENGAN NUSAVISION</span>
+            <ul class="text-xs text-neutral-200 space-y-2">
+              <li class="flex items-center gap-2"><span class="text-emerald-400 font-bold">✓</span> Deteksi dini anomali narasi dalam 3 menit</li>
+              <li class="flex items-center gap-2"><span class="text-emerald-400 font-bold">✓</span> Penerbitan berkas Proof of Concept (PoC) otomatis</li>
+              <li class="flex items-center gap-2"><span class="text-emerald-400 font-bold">✓</span> Pembuktian visual graf multi-hop siap pimpinan</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="p-3 bg-red-950/30 rounded-lg border border-red-900/60 flex items-center justify-between text-xs font-mono-tech">
+          <span class="text-neutral-300">HASIL AUDIT: EKSPOR LAPORAN DOSSIER FORENSIK (JSON & MARKDOWN)</span>
+          <span class="text-red-400 font-bold">ACTIONABLE INTEL</span>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SLIDE 12: ROADMAP & PENUTUP                -->
+      <!-- ========================================== -->
+      <section id="slide-12" class="slide-content flex-col justify-between h-full p-8 md:p-12 glass-card border-[#E10600]/40 glow-red-sm">
+        <div>
+          <span class="text-xs font-bold text-red-500 uppercase tracking-widest font-mono-tech">// KESIAPAN ADOPSI</span>
+          <h2 class="text-3xl md:text-4xl font-extrabold text-white mt-1">
+            <span class="font-serif-italic font-normal text-red-500 mr-2">Roadmap</span>Implementasi & Penutup
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 my-auto">
+          <div class="p-5 rounded-xl border border-white/10 bg-black/40 space-y-2">
+            <span class="text-xs font-bold text-red-400 font-mono-tech">FASE 01 // SEKARANG</span>
+            <h3 class="text-sm font-bold text-white">Purwarupa Fungsional</h3>
+            <p class="text-xs text-neutral-300 leading-relaxed">
+              Sistem telah teruji operasional 100% pada Kartika Cyber Hackathon 2026.
+            </p>
+          </div>
+          <div class="p-5 rounded-xl border border-white/10 bg-black/40 space-y-2">
+            <span class="text-xs font-bold text-amber-400 font-mono-tech">FASE 02 // 3-6 BULAN</span>
+            <h3 class="text-sm font-bold text-white">Integrasi SOC PUSSIBERAD</h3>
+            <p class="text-xs text-neutral-300 leading-relaxed">
+              Koneksi pipa data ke kanal internal komando dan repositori intelijen siber terpusat.
+            </p>
+          </div>
+          <div class="p-5 rounded-xl border border-white/10 bg-black/40 space-y-2">
+            <span class="text-xs font-bold text-emerald-400 font-mono-tech">FASE 03 // 1 TAHUN</span>
+            <h3 class="text-sm font-bold text-white">Distribusi Teritorial</h3>
+            <p class="text-xs text-neutral-300 leading-relaxed">
+              Penyebaran radar kognitif taktis bagi analis intelijen di jajaran Kodam se-Indonesia.
+            </p>
+          </div>
+        </div>
+
+        <div class="border-t border-white/10 pt-4 flex flex-col md:flex-row items-center justify-between gap-3">
+          <div class="text-xs text-neutral-300">
+            <span class="font-serif-italic text-red-500 font-bold">NusaVision:</span> Menjaga Kedaulatan Persepsi, Mengawal Persatuan Negeri.
+          </div>
+          <div class="text-xs font-mono-tech text-red-400 font-bold tracking-wider">
+            SATRIA YUDHA WASKITA // TERIMA KASIH
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- BOTTOM FLOATING HUD CONTROLS -->
+  <footer class="relative z-20 px-6 py-3 border-t border-white/[0.06] bg-[#06070a]/90 backdrop-blur-md flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <button onclick="prevSlide()" class="px-3.5 py-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 border border-white/10 text-neutral-300 hover:text-white transition flex items-center gap-1.5 text-xs font-bold">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+        <span>Sebelumnya (←)</span>
+      </button>
+      <button onclick="nextSlide()" class="px-4 py-1.5 rounded-lg bg-red-950 hover:bg-red-900 border border-red-800 text-red-200 hover:text-white transition flex items-center gap-1.5 text-xs font-bold glow-red-sm">
+        <span>Berikutnya (→)</span>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+      </button>
+    </div>
+
+    <!-- Center Keyboard Hint -->
+    <div class="hidden sm:flex items-center gap-2 text-[11px] text-neutral-400 font-mono-tech">
+      <span class="px-2 py-0.5 rounded bg-neutral-900 border border-white/10">Space</span> / <span class="px-2 py-0.5 rounded bg-neutral-900 border border-white/10">Arrow Keys</span> untuk Navigasi
+    </div>
+
+    <!-- Right Controls -->
+    <div class="flex items-center gap-2">
+      <a href="/" target="_blank" class="px-3 py-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 border border-white/10 text-neutral-300 hover:text-white transition text-xs font-medium flex items-center gap-1.5">
+        <span>Buka Purwarupa</span>
+        <svg class="w-3.5 h-3.5 text-neutral-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>
+      </a>
+    </div>
+  </footer>
+
+  <!-- SPEAKER NOTES SLIDE-OVER DRAWER -->
+  <aside id="speakerNotesDrawer" class="fixed top-0 right-0 w-96 max-w-full h-full bg-[#08090f]/95 border-l border-white/10 backdrop-blur-xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col justify-between p-6 shadow-2xl">
+    <div>
+      <div class="flex items-center justify-between pb-4 border-b border-white/10 mb-4">
+        <div class="flex items-center gap-2">
+          <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
+          <span class="text-xs font-bold uppercase tracking-wider text-white">Catatan Presenter</span>
+        </div>
+        <button onclick="toggleSpeakerNotes(false)" class="w-7 h-7 flex items-center justify-center rounded bg-neutral-900 border border-white/10 text-neutral-400 hover:text-white transition">
+          ✕
+        </button>
+      </div>
+
+      <div class="space-y-4">
+        <div class="flex items-center justify-between text-xs font-mono-tech">
+          <span id="notesSlideNumber" class="text-red-400 font-bold">SLIDE 01 / 12</span>
+          <span id="notesTimeTarget" class="text-neutral-400">⏱️ Target: 20 Detik</span>
+        </div>
+
+        <div class="space-y-2">
+          <div class="text-[10px] uppercase font-bold text-neutral-400 font-mono-tech">Naskah Suara (Voiceover Script):</div>
+          <p id="notesScriptText" class="text-xs text-neutral-200 leading-relaxed p-3.5 rounded-xl bg-black/60 border border-white/10 font-sans">
+            "Selamat pagi Dewan Juri Kartika Cyber Hackathon 2026. Kami mempersembahkan NusaVision: Cognitive Domain Defense Radar, platform intelijen siber sosial otonom untuk mendeteksi disinformasi, propaganda komputasional, dan jaringan botnet terkoordinasi."
+          </p>
+        </div>
+
+        <div class="space-y-1.5">
+          <div class="text-[10px] uppercase font-bold text-neutral-400 font-mono-tech">Aksi Layar / Fokus Visual:</div>
+          <p id="notesActionText" class="text-xs text-amber-300/90 leading-relaxed p-3 rounded-lg bg-amber-950/20 border border-amber-900/40 font-mono-tech">
+            Sorot logo monogram elang NV dan identitas kemitraan PUSSIBERAD TNI AD.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="pt-4 border-t border-white/10 text-[10px] text-neutral-400 font-mono-tech flex justify-between">
+      <span>TEKAN 'N' UNTUK TUTUP</span>
+      <span>TOTAL DURASI: 5 MENIT</span>
+    </div>
+  </aside>
+
+  <!-- JAVASCRIPT SLIDE CONTROLLER -->
+  <script>
+    const totalSlides = 12;
+    let currentSlide = 1;
+
+    const slideData = [
+      {
+        section: "01 • Cover Solusi",
+        time: "⏱️ Target: 20 Detik",
+        script: "Selamat pagi Dewan Juri Kartika Cyber Hackathon 2026. Kami mempersembahkan NusaVision: Cognitive Domain Defense Radar, platform intelijen siber sosial otonom berbasis hierarki Multi-Agent AI dan model penalaran lokal DeepSeek-R1 yang dirancang untuk memperkuat postur pertahanan Pusat Siber TNI Angkatan Darat.",
+        action: "Buka slide cover penuh wibawa. Tunjukkan identitas karya dan kategori Siber Sosial."
+      },
+      {
+        section: "02 • Alur Paparan",
+        time: "⏱️ Target: 20 Detik",
+        script: "Dalam waktu 5 menit ke depan, paparan kami terbagi ke dalam tiga blok utama: Pertama, pembedahan doktrin medan tempur kognitif; Kedua, arsitektur multi-agent dan pembuktian purwarupa operasional; dan Ketiga, nilai strategis kedaulatan data bagi satuan TNI AD.",
+        action: "Arahkan perhatian juri ke 3 kartu alur agar juri memahami struktur presentasi."
+      },
+      {
+        section: "03 • Medan Tempur Kognitif",
+        time: "⏱️ Target: 25 Detik",
+        script: "Perang modern kini merambah ke ranah kelima: Cognitive Domain. Senjata narasi disinformasi dan amplifikasi botnet terkoordinasi dapat merekayasa opini publik dalam hitungan jam, memecah belah persatuan, dan melumpuhkan pertahanan sebelum satu peluru pun ditembakkan di dunia fisik.",
+        action: "Tekankan istilah 'Cognitive Warfare' dan kaitkan dengan tugas pokok PUSSIBERAD."
+      },
+      {
+        section: "04 • Tiga Masalah Kritis",
+        time: "⏱️ Target: 25 Detik",
+        script: "Di lapangan, satuan menghadapi 3 hambatan besar: Analisis manual memakan waktu 6 hingga 12 jam saat narasi telah viral luas; akun botnet modern berkamuflase rapi; dan penggunaan AI komersial luar negeri berisiko membocorkan data investigasi militer sensitif ke cloud asing.",
+        action: "Sorot badge 'Kritis 01, 02, 03' untuk menegaskan urgensi solusi."
+      },
+      {
+        section: "05 • Solusi NusaVision",
+        time: "⏱️ Target: 25 Detik",
+        script: "Menjawab ketiga masalah tersebut, NusaVision mengintegrasikan 4 pilar kemampuan: Anomaly Scout untuk kecepatan transmisi, Graf SNA Force-Directed untuk membedah jaringan bot, Dual-Mode Hoax Classifier untuk cek fakta RAG, dan orkestrasi ReAct Multi-Agent berantai.",
+        action: "Jelaskan bahwa keempat pilar ini saling terhubung secara otomatis dalam satu radar."
+      },
+      {
+        section: "06 • Satgas Multi-Agent",
+        time: "⏱️ Target: 30 Detik",
+        script: "Sistem kami bekerja layaknya staf komando intelijen siber: Boss AI menerima target dan merumuskan strategi; Analis 1 mendeteksi lonjakan volume; Analis 2 mengukur polaritas sentimen; Operator 3 memetakan graf dan mengunci dalang; lalu Auditor 4 menerbitkan berkas PoC resmi secara streaming.",
+        action: "Tunjukkan alur komando dari kiri ke kanan (Boss AI hingga Auditor 4)."
+      },
+      {
+        section: "07 • Sentimen & Early Warning",
+        time: "⏱️ Target: 25 Detik",
+        script: "Modul Sentimen memantau dinamika emosi publik secara multi-series. Algoritma kami secara cerdas membedakan: apakah lonjakan percakapan bersifat organik alami dengan variasi wajar, atau serangan terorkestrasi terkoordinasi dengan kenaikan volume di atas 300 persen per jam.",
+        action: "Beri penekanan pada kemampuan membedakan dot hijau (Organik) vs dot merah (Terorkestrasi)."
+      },
+      {
+        section: "08 • Social Network Analysis",
+        time: "⏱️ Target: 30 Detik",
+        script: "Pada modul SNA, algoritma sentralitas D3.js secara presisi mengunci simpul dalang utama. Fitur Multi-Hop Traversal memungkinkan analis menelusuri rantai komando akun target hingga 2 derajat relasi secara instan, lengkap dengan probabilitas bot dan riwayat aktivitasnya.",
+        action: "Sorot fitur Multi-Hop Traversal yang mengisolasi jaringan dalang secara visual."
+      },
+      {
+        section: "09 • Hoax Classifier & RAG",
+        time: "⏱️ Target: 25 Detik",
+        script: "Modul Hoax Classifier menyediakan pemantauan feed disinformasi viral lintas medsos, serta lab forensik kustom yang membedah klaim teks bebas. Melalui verifikasi silang RAG ke sumber resmi, sistem memberikan skor fabrikasi narasi secara objektif dan transparan.",
+        action: "Tunjukkan 4 indikator manipulasi narasi pada kartu bawah."
+      },
+      {
+        section: "10 • Kedaulatan Data Mandiri",
+        time: "⏱️ Target: 25 Detik",
+        script: "NusaVision menjamin kedaulatan data penuh: 100 persen berjalan on-premise menggunakan model penalaran DeepSeek-R1 lokal. Tidak ada data intelijen yang bocor ke cloud luar negeri, dan biaya operasional token eksternal adalah nol rupiah.",
+        action: "Tegaskan nilai kedaulatan data (Zero Cloud Leakage) bagi institusi pertahanan."
+      },
+      {
+        section: "11 • Dampak Taktis TNI AD",
+        time: "⏱️ Target: 25 Detik",
+        script: "Dampaknya bagi PUSSIBERAD sangat nyata: waktu deteksi dipangkas dari 8 jam menjadi kurang dari 3 menit, bukti digital terstandarisasi ke dalam format PoC terenkripsi, dan kesiapan operasional pimpinan meningkat drastis menghadapi perang persepsi modern.",
+        action: "Bandingkan tabel metode konvensional vs kecepatan respons NusaVision."
+      },
+      {
+        section: "12 • Roadmap & Penutup",
+        time: "⏱️ Target: 20 Detik",
+        script: "Purwarupa NusaVision telah 100 persen teruji dan siap diintegrasikan ke Security Operations Center PUSSIBERAD TNI AD, serta didistribusikan ke komando teritorial Kodam. Kami siap mengawal kedaulatan kognitif Republik Indonesia. Satria Yudha Waskita! Terima kasih.",
+        action: "Tutup presentasi dengan sikap tegas, percaya diri, dan sebutkan semboyan resmi."
+      }
+    ];
+
+    function updateSlideView() {
+      // Toggle active classes
+      for (let i = 1; i <= totalSlides; i++) {
+        const slideEl = document.getElementById("slide-" + i);
+        if (slideEl) {
+          if (i === currentSlide) {
+            slideEl.classList.add("active");
+          } else {
+            slideEl.classList.remove("active");
+          }
+        }
+      }
+
+      // Update Header & Progress
+      const pct = (currentSlide / totalSlides) * 100;
+      document.getElementById("progressBar").style.width = pct + "%";
+      document.getElementById("slideCounterText").innerText = String(currentSlide).padStart(2, "0");
+
+      const currData = slideData[currentSlide - 1];
+      if (currData) {
+        document.getElementById("currentSectionName").innerText = currData.section;
+        document.getElementById("notesSlideNumber").innerText = "SLIDE " + String(currentSlide).padStart(2, "0") + " / " + totalSlides;
+        document.getElementById("notesTimeTarget").innerText = currData.time;
+        document.getElementById("notesScriptText").innerText = currData.script;
+        document.getElementById("notesActionText").innerText = currData.action;
+      }
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) {
+        currentSlide++;
+        updateSlideView();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) {
+        currentSlide--;
+        updateSlideView();
+      }
+    }
+
+    function toggleSpeakerNotes(forceState) {
+      const drawer = document.getElementById("speakerNotesDrawer");
+      const isClosed = drawer.classList.contains("translate-x-full");
+      const shouldOpen = forceState !== undefined ? forceState : isClosed;
+
+      if (shouldOpen) {
+        drawer.classList.remove("translate-x-full");
+      } else {
+        drawer.classList.add("translate-x-full");
+      }
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => console.log(err));
+      } else {
+        document.exitFullscreen().catch(err => console.log(err));
+      }
+    }
+
+    // Keyboard Navigation
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") {
+        e.preventDefault();
+        nextSlide();
+      } else if (e.key === "ArrowLeft" || e.key === "PageUp" || e.key === "Backspace") {
+        e.preventDefault();
+        prevSlide();
+      } else if (e.key === "n" || e.key === "N") {
+        toggleSpeakerNotes();
+      } else if (e.key === "f" || e.key === "F") {
+        toggleFullscreen();
+      } else if (e.key === "Home") {
+        currentSlide = 1;
+        updateSlideView();
+      } else if (e.key === "End") {
+        currentSlide = totalSlides;
+        updateSlideView();
+      } else if (e.key === "Escape") {
+        toggleSpeakerNotes(false);
+      }
+    });
+
+    // Init
+    document.addEventListener("DOMContentLoaded", () => {
+      updateSlideView();
+    });
+  </script>
+</body>
+</html>

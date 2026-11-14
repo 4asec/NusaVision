@@ -25,6 +25,11 @@ def home():
     index_path = os.path.join(os.path.dirname(__file__), "index.html")
     return FileResponse(index_path)
 
+@app.get("/slides")
+def slides():
+    slides_path = os.path.join(os.path.dirname(__file__), "slides.html")
+    return FileResponse(slides_path)
+
 @app.get("/favicon.ico")
 def favicon():
     icon_path = os.path.join(os.path.dirname(__file__), "assets", "logo-icon.svg")
