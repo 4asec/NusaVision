@@ -20,13 +20,13 @@ Platform ini mengintegrasikan **Hierarchical Multi-Agent AI System** dengan *Loc
 
 ```
 +-----------------------------------------------------------------------------------+
-|                              NUSAVISION ARCHITECTURE                              |
+|                        NUSAVISION TACTICAL ACTF ARCHITECTURE                      |
 +-----------------------------------------------------------------------------------+
-|  [OSINT Ingestion] ---> [Anomaly Scout] ---> [Hoax & Sentiment Reasoner]          |
-|  (RSS + DDG Search)      (Volumetric Spike)   (DeepSeek-R1 8B Fact-Check)         |
+|  [OSINT Ingestion] ---> [SIGNAL SCOUT]       ---> [NEURAL REASONER]               |
+|  (RSS + DDG Search)      (Velocity Anomaly)       (DeepSeek-R1 Cognitive Deconstruct) |
 |                                                      |                            |
-|  [Operator UI] <--- [Forensic Validator] <--- [BotRadar & Dense SNA Specialist]   |
-|  (D3.js + SSE)      (Threat Level Escalation) (Jaccard + Centrality Topologies)   |
+|  [Operator UI] <--- [VERITAS AUDITOR]        <--- [NEXUS TOPOLOGY]                |
+|  (D3.js + SSE)      (Evidence Seal & PoC)         (Cluster Graph & Hub Hunter)    |
 +-----------------------------------------------------------------------------------+
 ```
 
@@ -48,29 +48,29 @@ Platform ini mengintegrasikan **Hierarchical Multi-Agent AI System** dengan *Loc
 
 ---
 
-## 🤖 Hierarki Multi-Agent AI Office
+## 🤖 Hierarki Autonomous Cognitive Task Force (ACTF)
 
-Sistem mengadopsi pola orkestrasi **Autonomous ReAct State-Machine** dengan pembagian peran spesifik:
+Sistem mengadopsi pola orkestrasi **Autonomous ReAct State-Machine** berstandar intelijen militer dengan pembagian peran taktis:
 
 ```mermaid
 graph TD
-    User([Target Isu / Entitas]) --> Boss[Boss AI: Director & Commander]
-    Boss -->|Delegasi Query| Scraper[Ingestion / OSINT Worker]
-    Scraper -->|Transmisi Feed Publik| Agent1[Agen 1: Early Warning & Anomaly Scout]
-    Agent1 -->|Status Anomali & Rasio Lonjakan| Agent2[Agen 2: Hoax & Sentiment Reasoner]
-    Agent2 -->|Skor Fabrikasi & Polaritas Emosi| Agent3[Agen 3: BotRadar & Dense SNA Specialist]
-    Agent3 -->|Matriks Adjacency & Dalang Sentral| Agent4[Agen 4: Forensic Validator & PoC Auditor]
-    Agent4 -->|PoC Tervalidasi & Threat Escalation| UI([Console Dashboard Operator])
+    User([Target Isu / Entitas]) --> Stratcom[STRATCOM: Strategic Command Orchestrator]
+    Stratcom -->|Delegasi Query & Mandat| Scraper[Ingestion / OSINT Worker]
+    Scraper -->|Transmisi Feed Publik| Scout[Unit 1: SIGNAL SCOUT - Velocity Interceptor]
+    Scout -->|Status Anomali & Rasio Lonjakan| Reasoner[Unit 2: NEURAL REASONER - Cognitive Deconstructor]
+    Reasoner -->|Skor Fabrikasi & Polaritas Emosi| Nexus[Unit 3: NEXUS TOPOLOGY - Graph & Hub Hunter]
+    Nexus -->|Matriks Adjacency & Dalang Sentral| Veritas[Unit 4: VERITAS AUDITOR - Digital Evidence Seal]
+    Veritas -->|PoC Tervalidasi & Threat Escalation| UI([Console Dashboard Operator])
 ```
 
-| Agen | Nama Modul | Peran & Tanggung Jawab Operasional |
+| Unit ACTF | Kode Taktis | Peran & Tanggung Jawab Operasional |
 | :--- | :--- | :--- |
-| **Boss AI** | `Director / Commander` | Menerima instruksi target, merumuskan strategi investigasi siber sosial, mengorkestrasi alur kerja agen bawah, dan mengevaluasi kelayakan laporan akhir. |
+| **STRATCOM** | `Command Orchestrator` | Menerima instruksi target, merumuskan strategi investigasi siber kognitif, mengorkestrasi delegasi unit, dan mengevaluasi kelayakan laporan akhir. |
 | **Ingestion Worker** | `OSINT Fetcher` | Menarik percakapan aktual publik melalui transmisi Google News RSS dan DuckDuckGo News Search tanpa API key berbayar. |
-| **Agen 1** | `Anomaly Scout` | Menganalisis lonjakan volume percakapan per satuan waktu untuk membedakan pergerakan opini organik vs. amplifikasi buatan (*orchestrated burst*). |
-| **Agen 2** | `Hoax & Sentiment Reasoner` | Menjalankan inferensi penalaran DeepSeek-R1 8B dengan teknik RAG verifikasi silang untuk mengukur probabilitas fabrikasi narasi dan polaritas sentimen. |
-| **Agen 3** | `Dense SNA Specialist` | Mengkalkulasi skor probabilitas botnet, membangun matriks relasi graf rimbun puluhan node, dan mengidentifikasi simpul koordinator utama (*central mastermind*). |
-| **Agen 4** | `Forensic Validator` | Melakukan audit silang seluruh bukti digital dari Agen 1–3, menetapkan eskalasi ancaman (*LOW, MEDIUM, HIGH, CRITICAL*), dan menerbitkan Proof of Concept (PoC) tervalidasi. |
+| **SIGNAL SCOUT** | `Velocity & Anomaly Interceptor` | Menganalisis kecepatan transmisi lonjakan narasi per detik untuk membedakan pergerakan opini organik vs. amplifikasi buatan (*orchestrated surge*). |
+| **NEURAL REASONER** | `Cognitive Deconstructor` | Menjalankan inferensi penalaran DeepSeek-R1 8B dengan teknik RAG verifikasi silang untuk mengukur probabilitas fabrikasi narasi dan polaritas sentimen. |
+| **NEXUS TOPOLOGY** | `Cluster Graph & Hub Hunter` | Mengkalkulasi skor probabilitas botnet, membangun matriks relasi graf rimbun puluhan node, dan mengidentifikasi simpul koordinator utama (*central mastermind*). |
+| **VERITAS AUDITOR** | `Digital Forensics & Evidence Seal` | Melakukan audit silang seluruh bukti digital lintas-unit, menetapkan eskalasi ancaman (*LOW, MEDIUM, HIGH, CRITICAL*), dan menerbitkan Proof of Concept (PoC) tervalidasi. |
 
 ---
 

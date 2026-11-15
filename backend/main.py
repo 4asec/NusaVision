@@ -52,15 +52,15 @@ def get_dashboard_overview():
     total_ops = len(investigations_store)
     return {
         "system_status": "ONLINE / DEFENSE READY",
-        "active_division": "AI Office Cognitive Domain Satgas",
+        "active_division": "Autonomous Cognitive Task Force (ACTF)",
         "llm_engine": "DeepSeek-R1 (8B Local via Ollama)",
         "total_investigations_completed": total_ops,
         "active_agents": [
-            {"id": "boss", "name": "Boss AI (Commander)", "status": "ACTIVE"},
-            {"id": "agent_1", "name": "Early Warning & Anomaly Scout", "status": "ACTIVE"},
-            {"id": "agent_2", "name": "Hoax & Sentiment Reasoner", "status": "ACTIVE"},
-            {"id": "agent_3", "name": "BotRadar & Dense SNA Specialist", "status": "ACTIVE"},
-            {"id": "agent_4", "name": "Forensic Validator & PoC Auditor", "status": "ACTIVE"}
+            {"id": "boss", "name": "STRATCOM (Strategic Command Orchestrator)", "status": "ACTIVE"},
+            {"id": "agent_1", "name": "SIGNAL SCOUT (Velocity & Anomaly Interceptor)", "status": "ACTIVE"},
+            {"id": "agent_2", "name": "NEURAL REASONER (Cognitive & Narrative Deconstructor)", "status": "ACTIVE"},
+            {"id": "agent_3", "name": "NEXUS TOPOLOGY (Cluster Graph & Hub Hunter)", "status": "ACTIVE"},
+            {"id": "agent_4", "name": "VERITAS AUDITOR (Digital Forensics & Evidence Seal)", "status": "ACTIVE"}
         ]
     }
 

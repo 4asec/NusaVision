@@ -55,19 +55,19 @@ class BossOrchestrator:
         }
 
         # -------------------------------------------------------------
-        # 1. BOSS AI (Director & Mission Delegator)
+        # 1. STRATCOM (Strategic Command Orchestrator)
         # -------------------------------------------------------------
-        msg_boss_init = f"[COMMANDER - DIR. OPERASI] Menginisialisasi Satgas Siber Kognitif. Target operasi: '{topik}'. Mengunci parameter pemantauan."
+        msg_boss_init = f"[STRATCOM - ORCHESTRATOR] Menginisialisasi Autonomous Cognitive Task Force (ACTF). Target operasi: '{topik}'. Mengunci parameter pemantauan."
         yield f"data: {json.dumps({'stage': 'boss', 'status': 'working', 'message': msg_boss_init, 'investigation_id': investigation_id})}\n\n"
         await asyncio.sleep(0.6)
 
         prompt_boss = (
-            f"Kamu adalah Boss AI Direktur Operasi NusaVision. Target investigasi sasaran: '{topik}'. "
-            f"Tulis mandat perintah taktis militer siber singkat (2 kalimat tegas) untuk 4 analis bawahanmu."
+            f"Kamu adalah STRATCOM Orchestrator NusaVision (Pusat Siber Pertahanan Kognitif). Target sasaran: '{topik}'. "
+            f"Tulis mandat komando taktis militer siber singkat (2 kalimat tegas) untuk 4 unit ACTF bawahanmu."
         )
         directive_text = await model_router.query(prompt_boss, max_tokens=100)
         context["boss_directive"] = directive_text
-        msg_boss_done = f"[COMMANDER - MANDAT OPERASI] {directive_text}"
+        msg_boss_done = f"[STRATCOM - MANDAT OPERASI] {directive_text}"
         yield f"data: {json.dumps({'stage': 'boss', 'status': 'done', 'message': msg_boss_done})}\n\n"
         await asyncio.sleep(0.5)
 
@@ -83,19 +83,19 @@ class BossOrchestrator:
         await asyncio.sleep(0.7)
 
         sample_context = " | ".join([f"{r['username']} ({r['platform']}): {r['isi_komentar'][:90]}" for r in live_records[:4]])
-        msg_scraper_done = f"[INGESTION WORKER] Berhasil mengakuisisi {len(live_records)} transmisi data publik. Mengirim payload ke Agen 1 & Agen 2."
+        msg_scraper_done = f"[INGESTION WORKER] Berhasil mengakuisisi {len(live_records)} transmisi data publik. Mengirim payload ke SIGNAL SCOUT & NEURAL REASONER."
         yield f"data: {json.dumps({'stage': 'scraper', 'status': 'done', 'message': msg_scraper_done, 'records_count': len(live_records)})}\n\n"
         await asyncio.sleep(0.5)
 
         # -------------------------------------------------------------
-        # 3. AGEN 1: Early Warning & Anomaly Scout
+        # 3. UNIT 01: SIGNAL SCOUT (Velocity & Anomaly Interceptor)
         # -------------------------------------------------------------
-        msg_a1_work = "[AGEN 1 - EARLY WARNING] Memindai anomali kecepatan transmisi narasi dan variasi frekuensi..."
+        msg_a1_work = "[SIGNAL SCOUT - VELOCITY & ANOMALY] Memindai anomali kecepatan transmisi narasi dan variasi frekuensi..."
         yield f"data: {json.dumps({'stage': 'agent_1', 'status': 'working', 'message': msg_a1_work})}\n\n"
 
         prompt_a1 = (
             f"Teks transmisi publik isu '{topik}':\n{sample_context}\n\n"
-            f"Tugasmu Agen 1: Klasifikasikan dalam 2 kalimat tegas apakah lonjakan narasi ini adalah 'DELIBERATE SURGE' "
+            f"Tugasmu SIGNAL SCOUT: Klasifikasikan dalam 2 kalimat tegas apakah lonjakan narasi ini adalah 'DELIBERATE SURGE' "
             f"(serangan propaganda buzzer terencana) atau 'ORGANIC VARIATION' (lonjakan wajar publik)? Sebutkan tingkat risiko."
         )
         eval_a1 = await model_router.query(prompt_a1, max_tokens=110)
@@ -109,14 +109,14 @@ class BossOrchestrator:
             "anomaly_score": anomaly_score,
             "evaluation": eval_a1
         }
-        msg_a1_done = f"[AGEN 1 - ANOMALI: {surge_type} ({anomaly_score}%)] {eval_a1}"
+        msg_a1_done = f"[SIGNAL SCOUT - ANOMALI: {surge_type} ({anomaly_score}%)] {eval_a1}"
         yield f"data: {json.dumps({'stage': 'agent_1', 'status': 'done', 'message': msg_a1_done, 'data': context['agent_1_result']})}\n\n"
         await asyncio.sleep(0.6)
 
         # -------------------------------------------------------------
-        # 4. AGEN 2: Hoax & Sentiment Reasoner (dengan RAG Periksa Fakta)
+        # 4. UNIT 02: NEURAL REASONER (Cognitive & Narrative Deconstructor)
         # -------------------------------------------------------------
-        msg_a2_work = "[AGEN 2 - HOAX & SENTIMENT] DeepSeek menguji plausibilitas klaim terhadap sumber rujukan dan memetakan polaritas sentimen..."
+        msg_a2_work = "[NEURAL REASONER - COGNITIVE & NARRATIVE] DeepSeek menguji plausibilitas klaim terhadap sumber rujukan dan membedah distorsi narasi..."
         yield f"data: {json.dumps({'stage': 'agent_2', 'status': 'working', 'message': msg_a2_work})}\n\n"
 
         # RAG Fact-Checking seputar klaim utama
@@ -127,7 +127,7 @@ class BossOrchestrator:
         prompt_a2 = (
             f"Klaim publik sasaran: '{klaim_sampel}'\n"
             f"Rujukan klarifikasi: {fakta_text}\n"
-            f"Tugasmu Agen 2: Simpulkan polaritas sentimen publik (Positif/Netral/Negatif) dan apakah klaim ini berpotensi disinformasi/hoaks. "
+            f"Tugasmu NEURAL REASONER: Simpulkan polaritas sentimen publik (Positif/Netral/Negatif) dan apakah klaim ini berpotensi disinformasi/hoaks. "
             f"Tulis dalam 2 kalimat analisis kritis."
         )
         eval_a2 = await model_router.query(prompt_a2, max_tokens=120)
@@ -147,14 +147,14 @@ class BossOrchestrator:
             "manipulation_tags": manipulation_tags,
             "fact_sources_count": len(rujukan_fakta)
         }
-        msg_a2_done = f"[AGEN 2 - EVALUASI KOGNITIF] {eval_a2} [Indikator: {', '.join(manipulation_tags)}]"
+        msg_a2_done = f"[NEURAL REASONER - EVALUASI KOGNITIF] {eval_a2} [Indikator: {', '.join(manipulation_tags)}]"
         yield f"data: {json.dumps({'stage': 'agent_2', 'status': 'done', 'message': msg_a2_done, 'data': context['agent_2_result']})}\n\n"
         await asyncio.sleep(0.7)
 
         # -------------------------------------------------------------
-        # 5. AGEN 3: BotRadar & Dense SNA Specialist
+        # 5. UNIT 03: NEXUS TOPOLOGY (Cluster Graph & Hub Hunter)
         # -------------------------------------------------------------
-        msg_a3_work = "[AGEN 3 - BOTRADAR & SNA] Menghitung matriks kemiripan leksikal, mengurai klaster botnet, dan merekonstruksi graf rimbun..."
+        msg_a3_work = "[NEXUS TOPOLOGY - CLUSTER & GRAPH] Menghitung matriks kemiripan leksikal, mengurai klaster botnet, dan merekonstruksi graf rimbun..."
         yield f"data: {json.dumps({'stage': 'agent_3', 'status': 'working', 'message': msg_a3_work})}\n\n"
 
         # Pemetaan topologi graf D3.js dengan data kontekstual solid
@@ -171,14 +171,14 @@ class BossOrchestrator:
             "network_graph": sna_result["network_graph"]
         }
 
-        msg_a3_done = f"[AGEN 3 - TOPOLOGI DENSE SNA] Graf terurai: {total_nodes} node terhubung. Terdeteksi {total_bots} akun botnet. Simpul dalang utama: {mastermind}."
+        msg_a3_done = f"[NEXUS TOPOLOGY - DENSE SNA] Graf terurai: {total_nodes} node terhubung. Terdeteksi {total_bots} akun botnet. Simpul dalang utama: {mastermind}."
         yield f"data: {json.dumps({'stage': 'agent_3', 'status': 'done', 'message': msg_a3_done, 'data': sna_result})}\n\n"
         await asyncio.sleep(0.8)
 
         # -------------------------------------------------------------
-        # 6. AGEN 4: Forensic Validator & PoC Auditor
+        # 6. UNIT 04: VERITAS AUDITOR (Digital Forensics & Evidence Seal)
         # -------------------------------------------------------------
-        msg_a4_work = "[AGEN 4 - FORENSIC AUDITOR] Melakukan validasi silang bukti digital lintas-agen dan menyusun Dokumen Pembuktian (PoC)..."
+        msg_a4_work = "[VERITAS AUDITOR - FORENSIC EVIDENCE] Melakukan validasi silang bukti digital lintas-agen dan menyusun Dokumen Pembuktian (PoC)..."
         yield f"data: {json.dumps({'stage': 'agent_4', 'status': 'working', 'message': msg_a4_work})}\n\n"
 
         # Penentuan status eskalasi ancaman resmi
@@ -220,7 +220,7 @@ class BossOrchestrator:
         # Simpan ke memori store agar bisa diunduh kapan saja
         investigations_store[investigation_id] = context
 
-        msg_a4_done = f"[AGEN 4 - AUDITOR RESMI] Berkas Proof of Concept (PoC) [{investigation_id}] resmi diterbitkan dan siap diekspor."
+        msg_a4_done = f"[VERITAS AUDITOR - BUKTI DIGITAL] Berkas Proof of Concept (PoC) [{investigation_id}] resmi diterbitkan dan siap diekspor."
         yield f"data: {json.dumps({'stage': 'agent_4', 'status': 'done', 'final_poc': final_poc, 'message': msg_a4_done})}\n\n"
 
     def get_investigation(self, investigation_id: str) -> Dict[str, Any]:
@@ -249,21 +249,21 @@ class BossOrchestrator:
             f"- **Central Mastermind**  : `{poc.get('dalang_utama', '@lead_hub')}`",
             f"- **Network Density**     : {nodes} Node Teranalisis | {bots} Akun Botnet Teridentifikasi",
             f"--------------------------------------------------------------------------------\n",
-            f"## 1. MANDAT DIREKTUR OPERASI (BOSS AI)",
+            f"## 1. MANDAT STRATCOM ORCHESTRATOR",
             f"{ctx.get('boss_directive', '-')}\n",
-            f"## 2. TEMUAN EARLY WARNING & ANOMALI NARASI (AGEN 1)",
+            f"## 2. TEMUAN SIGNAL SCOUT (VELOCITY & ANOMALY)",
             f"- **Klasifikasi Lonjakan**: {ctx.get('agent_1_result', {}).get('surge_type', '-')}",
             f"- **Skor Anomali**       : {ctx.get('agent_1_result', {}).get('anomaly_score', '-')}%",
             f"- **Analisis Scout**      : {ctx.get('agent_1_result', {}).get('evaluation', '-')}\n",
-            f"## 3. PENALARAN DISINFORMASI & SENTIMEN KOGNITIF (AGEN 2)",
+            f"## 3. PENALARAN NEURAL REASONER (KOGNITIF & NARASI)",
             f"- **Polaritas Dominan**  : {ctx.get('agent_2_result', {}).get('sentiment', '-')}",
             f"- **Indikator Manipulasi**: {', '.join(ctx.get('agent_2_result', {}).get('manipulation_tags', []))}",
             f"- **Evaluasi Plausibilitas**: {ctx.get('agent_2_result', {}).get('evaluation', '-')}\n",
-            f"## 4. TOPOLOGI SOCIAL NETWORK ANALYSIS (AGEN 3)",
+            f"## 4. TOPOLOGI NEXUS TOPOLOGY (CLUSTER & DENSE SNA)",
             f"- Simpul Sentral (Hub) : `{poc.get('dalang_utama')}`",
             f"- Total Klaster Botnet : {bots} Akun Terkoordinasi",
             f"- Indikasi Profiling   : Akun baru dibuat (<5 hari), duplikasi narasi leksikal, amplifikasi serentak.\n",
-            f"## 5. BUKTI FORENSIK TERVALIDASI (AGEN 4)",
+            f"## 5. BUKTI FORENSIK VERITAS AUDITOR",
         ]
         for p in poc.get("key_evidence_points", []):
             lines.append(f"  [+] {p}")
@@ -272,7 +272,7 @@ class BossOrchestrator:
             f"\n## 6. REKOMENDASI TAKTIS & KONTRA-NARASI",
             f"{poc.get('rekomendasi', '-')}\n",
             f"--------------------------------------------------------------------------------",
-            f"Dokumen ini diterbitkan secara otomatis oleh NusaVision Autonomous Multi-Agent Defense Engine.",
+            f"Dokumen ini diterbitkan secara otomatis oleh NusaVision Autonomous Cognitive Task Force (ACTF).",
             f"Diverifikasi oleh: Kartika Cyber Hackathon - Cognitive Domain Radar Team."
         ])
         return "\n".join(lines)

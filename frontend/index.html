@@ -288,7 +288,7 @@
         <a href="#sna-section" onclick="toggleNavDrawer(false)" class="group block p-3 rounded bg-[#0e0e14] border border-[#1c1c24] hover:border-[#ff2a2a] transition">
           <div class="text-[10px] text-[#ff2a2a] font-bold">SECTION 03</div>
           <div class="text-sm font-bold text-neutral-200 group-hover:text-white">Social Network Analysis</div>
-          <div class="text-[10px] text-neutral-400 mt-0.5">Graf rimbun, dalang sentral, satgas AI</div>
+          <div class="text-[10px] text-neutral-400 mt-0.5">Graf rimbun, dalang sentral, unit ACTF</div>
         </a>
         <a href="#hoax-section" onclick="toggleNavDrawer(false)" class="group block p-3 rounded bg-[#0e0e14] border border-[#1c1c24] hover:border-[#ff2a2a] transition">
           <div class="text-[10px] text-[#ff2a2a] font-bold">SECTION 04</div>
@@ -305,7 +305,7 @@
         <span class="text-neutral-200 font-bold">DeepSeek-R1:8b</span>
       </div>
       <div class="flex justify-between text-neutral-400">
-        <span>Satgas AI Divisi:</span>
+        <span>Satgas ACTF Divisi:</span>
         <span class="text-[#ff2a2a] font-bold">5 Agen Aktif</span>
       </div>
       <div class="flex justify-between text-neutral-400">
@@ -431,7 +431,7 @@
             </svg>
           </a>
           <a href="#sna-section" class="bg-[#0e0e14] hover:bg-neutral-900 border border-[#1c1c24] hover:border-neutral-700 text-neutral-300 text-xs font-bold px-5 py-2.5 rounded uppercase tracking-wider transition flex items-center gap-2">
-            <span>Luncurkan Satgas AI</span>
+            <span>Inisialisasi Satgas ACTF</span>
           </a>
         </div>
 
@@ -627,7 +627,7 @@
           // SECTION 03
         </div>
         <h2 class="text-xl md:text-2xl font-black text-white uppercase tracking-wider">
-          Social Network Analysis & Satgas Multi-Agent
+          Social Network Analysis & Autonomous Task Force (ACTF)
         </h2>
         <p class="text-xs text-neutral-400 mt-1">
           Pemetaan graf rimbun force-directed, penguncian simpul dalang utama, dan investigasi multi-hop
@@ -637,7 +637,7 @@
       <!-- Status Satgas AI -->
       <div class="flex items-center gap-2 text-xs bg-[#0e0e14] border border-[#1c1c24] px-3 py-1.5 rounded">
         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-        <span class="text-neutral-300 font-bold">5 AGEN SATGAS: ONLINE</span>
+        <span class="text-neutral-300 font-bold">5 UNIT ACTF: ONLINE</span>
       </div>
     </div>
 
@@ -651,7 +651,7 @@
           </div>
         </div>
         <button onclick="startInvestigation()" class="bg-red-950 hover:bg-red-900 border border-[#ff2a2a] text-white font-bold text-xs px-6 py-2 rounded uppercase tracking-wider transition glow-red shrink-0 flex items-center justify-center gap-2">
-          <span>Luncurkan Satgas Siber</span>
+          <span>Luncurkan Satgas ACTF</span>
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
           </svg>
@@ -661,33 +661,33 @@
       <!-- KARTU HIERARKI MULTI-AGENT (BOSS AI -> ANALIS 1 -> ANALIS 2 -> OPERATOR 3 -> AUDITOR 4) -->
       <div class="mt-4 pt-3 border-t border-[#1c1c24]">
         <div class="text-[10px] text-neutral-400 uppercase tracking-widest mb-2 flex items-center justify-between">
-          <span>// Alur Komando Satgas Multi-Agent (AI Office)</span>
+          <span>// Alur Komando Autonomous Cognitive Task Force (ACTF)</span>
           <span id="agent-active-counter" class="text-[#ff2a2a]">MENUNGGU PERINTAH</span>
         </div>
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 text-center">
           <div id="card-boss" class="border border-[#1c1c24] bg-black/40 p-2 rounded transition-all">
-            <div class="text-[9px] text-neutral-400">KOMANDAN</div>
-            <div class="text-xs font-bold text-neutral-200">Boss AI</div>
+            <div class="text-[9px] text-neutral-400">ORKESTRATOR</div>
+            <div class="text-xs font-bold text-neutral-200">STRATCOM</div>
             <div id="status-boss" class="text-[9px] text-neutral-400 mt-1 font-mono">STANDBY</div>
           </div>
           <div id="card-agent_1" class="border border-[#1c1c24] bg-black/40 p-2 rounded transition-all">
-            <div class="text-[9px] text-neutral-400">ANALIS 01</div>
-            <div class="text-xs font-bold text-neutral-200">Early Warning</div>
+            <div class="text-[9px] text-neutral-400">INTERCEPTOR 01</div>
+            <div class="text-xs font-bold text-neutral-200">SIGNAL SCOUT</div>
             <div id="status-agent_1" class="text-[9px] text-neutral-400 mt-1 font-mono">STANDBY</div>
           </div>
           <div id="card-agent_2" class="border border-[#1c1c24] bg-black/40 p-2 rounded transition-all">
-            <div class="text-[9px] text-neutral-400">ANALIS 02</div>
-            <div class="text-xs font-bold text-neutral-200">DeepSeek Reasoner</div>
+            <div class="text-[9px] text-neutral-400">DECONSTRUCTOR 02</div>
+            <div class="text-xs font-bold text-neutral-200">NEURAL REASONER</div>
             <div id="status-agent_2" class="text-[9px] text-neutral-400 mt-1 font-mono">STANDBY</div>
           </div>
           <div id="card-agent_3" class="border border-[#1c1c24] bg-black/40 p-2 rounded transition-all">
-            <div class="text-[9px] text-neutral-400">OPERATOR 03</div>
-            <div class="text-xs font-bold text-neutral-200">BotRadar & SNA</div>
+            <div class="text-[9px] text-neutral-400">GRAPH HUNTER 03</div>
+            <div class="text-xs font-bold text-neutral-200">NEXUS TOPOLOGY</div>
             <div id="status-agent_3" class="text-[9px] text-neutral-400 mt-1 font-mono">STANDBY</div>
           </div>
           <div id="card-agent_4" class="border border-[#1c1c24] bg-black/40 p-2 rounded transition-all col-span-2 sm:col-span-1">
-            <div class="text-[9px] text-neutral-400">AUDITOR 04</div>
-            <div class="text-xs font-bold text-neutral-200">Forensic PoC</div>
+            <div class="text-[9px] text-neutral-400">EVIDENCE AUDITOR 04</div>
+            <div class="text-xs font-bold text-neutral-200">VERITAS AUDITOR</div>
             <div id="status-agent_4" class="text-[9px] text-neutral-400 mt-1 font-mono">STANDBY</div>
           </div>
         </div>
@@ -696,7 +696,7 @@
         <div class="mt-3 bg-black border border-[#1c1c24] p-2.5 rounded flex items-center gap-2">
           <span class="text-[#ff2a2a] text-xs font-bold shrink-0">></span>
           <div id="office-log" class="text-[11px] text-neutral-300 font-mono truncate flex-1">
-            Sistem radar siaga. Tentukan target operasi dan klik 'Luncurkan Satgas Siber'.
+            Sistem radar siaga. Tentukan target operasi dan klik 'Luncurkan Satgas ACTF'.
           </div>
         </div>
       </div>
@@ -817,7 +817,7 @@
         <div class="border-t border-[#1c1c24] pt-3 space-y-2.5">
           <div class="text-[10px] text-neutral-400 font-bold uppercase">KESIMPULAN AUDIT POC:</div>
           <div id="poc-summary-box" class="text-[11px] text-neutral-300 bg-black/60 p-2.5 rounded border border-[#1c1c24] leading-relaxed italic">
-            Satgas belum menjalankan investigasi penuh untuk sasaran ini.
+            Satgas ACTF belum menjalankan investigasi penuh untuk sasaran ini.
           </div>
           
           <div class="flex justify-between items-center text-xs">
@@ -1089,7 +1089,7 @@
           <li class="hover:text-neutral-200 transition">Kartika Cyber Hackathon 2026</li>
           <li class="hover:text-neutral-200 transition">Kategori: Siber Sosial (Cognitive Domain)</li>
           <li class="hover:text-neutral-200 transition">Divisi Pertahanan Opini & OSINT</li>
-          <li class="hover:text-neutral-200 transition">Kerangka Kerja: AI Office Multi-Agent</li>
+          <li class="hover:text-neutral-200 transition">Kerangka Kerja: Autonomous Cognitive Task Force (ACTF)</li>
         </ul>
       </div>
 
@@ -1156,7 +1156,7 @@
     const preloaderSteps = [
       { max: 25, text: "Menginisialisasi sistem siber & kernel radar..." },
       { max: 55, text: "Menghubungkan ke reasoning engine (DeepSeek-R1)..." },
-      { max: 82, text: "Memuat modul Satgas Multi-Agent & kontrak operasional..." },
+      { max: 82, text: "Memuat modul Autonomous Task Force (ACTF) & protokol intelijen..." },
       { max: 96, text: "Merender dashboard kognitif & topologi graf SNA..." },
       { max: 100, text: "Sistem radar siaga penuh. Memulai pemantauan." }
     ];
@@ -1178,12 +1178,69 @@
         setTimeout(() => {
           preloaderElem.classList.add("fade-out");
           initApp();
+        if (urlParams.get("demo_actf") === "1") {
+          setTimeout(() => {
+            setAgentStatus("boss", "done", "COORDINATED");
+            setAgentStatus("agent_1", "done", "SURGE CONFIRMED");
+            setAgentStatus("agent_2", "done", "NARRATIVE PARSED");
+            setAgentStatus("agent_3", "done", "BOTNET LOCKED");
+            setAgentStatus("agent_4", "done", "POC VERIFIED");
+            document.getElementById("agent-active-counter").innerText = "OPERASI SELESAI // POC SIAGA";
+            document.getElementById("office-log").innerText = "> [VERITAS AUDITOR - BUKTI DIGITAL] Berkas Proof of Concept (PoC) [NV-ACTF-2026-X9] resmi disahkan. Tingkat eskalasi: CRITICAL THREAT.";
+            document.getElementById("poc-summary-box").innerText = "Investigasi sasaran '#PilkadaSerentak2024' tervalidasi dengan tingkat CRITICAL THREAT. Teridentifikasi pola orkestrasi kognitif botnet berpusat pada simpul @lead_hub_ops. Model DeepSeek-R1 mendeteksi fabrikasi opini terkoordinasi (Coordinated Amplification, Fabricated Outrage).";
+            const tb = document.getElementById("poc-threat-badge");
+            tb.innerText = "CRITICAL THREAT";
+            tb.className = "font-extrabold text-[#ff2a2a] font-mono animate-pulse";
+            document.getElementById("btn-export-json").disabled = false;
+            document.getElementById("btn-export-md").disabled = false;
+          }, 50);
+        }
         }, 300);
       }
     }
 
     window.addEventListener("DOMContentLoaded", () => {
-      advancePreloader();
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get("nopreloader") === "1") {
+        if (preloaderElem) preloaderElem.style.display = "none";
+        const view = urlParams.get("view");
+        if (view === "sentiment") {
+          const hero = document.getElementById("hero-section");
+          if (hero) hero.style.display = "none";
+        } else if (view === "sna" || view === "actf") {
+          const hero = document.getElementById("hero-section");
+          const sent = document.getElementById("sentiment-section");
+          if (hero) hero.style.display = "none";
+          if (sent) sent.style.display = "none";
+        } else if (view === "hoax") {
+          const hero = document.getElementById("hero-section");
+          const sent = document.getElementById("sentiment-section");
+          const sna = document.getElementById("sna-section");
+          if (hero) hero.style.display = "none";
+          if (sent) sent.style.display = "none";
+          if (sna) sna.style.display = "none";
+        }
+        initApp();
+        if (urlParams.get("demo_actf") === "1") {
+          setTimeout(() => {
+            setAgentStatus("boss", "done", "COORDINATED");
+            setAgentStatus("agent_1", "done", "SURGE CONFIRMED");
+            setAgentStatus("agent_2", "done", "NARRATIVE PARSED");
+            setAgentStatus("agent_3", "done", "BOTNET LOCKED");
+            setAgentStatus("agent_4", "done", "POC VERIFIED");
+            document.getElementById("agent-active-counter").innerText = "OPERASI SELESAI // POC SIAGA";
+            document.getElementById("office-log").innerText = "> [VERITAS AUDITOR - BUKTI DIGITAL] Berkas Proof of Concept (PoC) [NV-ACTF-2026-X9] resmi disahkan. Tingkat eskalasi: CRITICAL THREAT.";
+            document.getElementById("poc-summary-box").innerText = "Investigasi sasaran '#PilkadaSerentak2024' tervalidasi dengan tingkat CRITICAL THREAT. Teridentifikasi pola orkestrasi kognitif botnet berpusat pada simpul @lead_hub_ops. Model DeepSeek-R1 mendeteksi fabrikasi opini terkoordinasi (Coordinated Amplification, Fabricated Outrage).";
+            const tb = document.getElementById("poc-threat-badge");
+            tb.innerText = "CRITICAL THREAT";
+            tb.className = "font-extrabold text-[#ff2a2a] font-mono animate-pulse";
+            document.getElementById("btn-export-json").disabled = false;
+            document.getElementById("btn-export-md").disabled = false;
+          }, 50);
+        }
+      } else {
+        advancePreloader();
+      }
     });
 
     /* Matrix Rain removed for clean, minimalist, humanized aesthetic */
@@ -1898,7 +1955,7 @@
       document.getElementById("btn-export-md").disabled = true;
 
       const officeLog = document.getElementById("office-log");
-      officeLog.innerText = `> Mengontak Commander Boss AI untuk target: "${topik}"...`;
+      officeLog.innerText = `> Mengontak STRATCOM Orchestrator untuk target: "${topik}"...`;
 
       // Reset card status
       ["boss", "agent_1", "agent_2", "agent_3", "agent_4"].forEach(ag => setAgentStatus(ag, "standby", "STANDBY"));

@@ -14,36 +14,36 @@ class AutonomousCyberOffice:
     def run_full_mission(self, topic: str):
         log_eksekusi = []
 
-        # 1. BOSS AI (Director & Mission Delegator)
+        # 1. STRATCOM (Strategic Command Orchestrator)
         prompt_boss = (
-            f"Kamu adalah Boss AI / Direktur Operasi Siber NusaVision. "
+            f"Kamu adalah STRATCOM Orchestrator / Direktur Intelijen Siber NusaVision. "
             f"Misi masuk dengan target: '{topic}'. "
-            f"Buat pembagian arahan ringkas ke 4 agen analis bawahanmu "
-            f"(Agen 1: Early Warning, Agen 2: Hoax/Sentimen, Agen 3: BotRadar/OSINT, Agen 4: Validator/PoC). "
-            f"Tulis instruksi dalam 3 kalimat tegas dan taktis."
+            f"Buat pembagian arahan ringkas ke 4 unit ACTF bawahanmu "
+            f"(Unit 1: SIGNAL SCOUT, Unit 2: NEURAL REASONER, Unit 3: NEXUS TOPOLOGY, Unit 4: VERITAS AUDITOR). "
+            f"Tulis instruksi dalam 3 kalimat tegas dan taktis standar militer."
         )
         resp_boss = self.llm.invoke(prompt_boss)
         log_eksekusi.append({
-            "agent": "Boss AI (Director of Operations)",
+            "agent": "STRATCOM (Strategic Command Orchestrator)",
             "action": "Strategi Komando Operasi",
             "thought": resp_boss.content
         })
 
-        # 2. AGEN 1: Early Warning & Anomaly Scout
+        # 2. UNIT 01: SIGNAL SCOUT (Velocity & Anomaly Interceptor)
         prompt_agen1 = (
-            f"Kamu adalah Agen 1 (Early Warning & Anomaly Scout). "
+            f"Kamu adalah Unit 1 SIGNAL SCOUT (Velocity & Anomaly Interceptor). "
             f"Topik investigasi: '{topic}'. "
             f"Analisis apakah lonjakan percakapan pada topik ini terindikasi deliberate (serangan propaganda yang disengaja) "
             f"atau tren organik publik. Berikan evaluasi ancaman ringkas."
         )
         resp_agen1 = self.llm.invoke(prompt_agen1)
         log_eksekusi.append({
-            "agent": "Agen 1 - Early Warning & Anomaly Scout",
+            "agent": "SIGNAL SCOUT (Velocity & Anomaly Interceptor)",
             "action": "Deteksi Dini Lonjakan Narasi",
             "thought": resp_agen1.content
         })
 
-        # 3. AGEN 2: Hoax & Sentiment Analyst
+        # 3. UNIT 02: NEURAL REASONER (Cognitive & Narrative Deconstructor)
         with open("sample_data.csv", "r", encoding="utf-8") as f:
             raw_text = f.read()
 
@@ -57,12 +57,12 @@ class AutonomousCyberOffice:
         )
         resp_agen2 = self.llm.invoke(prompt_agen2)
         log_eksekusi.append({
-            "agent": "Agen 2 - Disinformation & Sentiment Analyst",
-            "action": "Analisis Hoaks & Opini Publik",
+            "agent": "NEURAL REASONER (Cognitive & Narrative Deconstructor)",
+            "action": "Dekonstruksi Narasi & Disinformasi",
             "thought": resp_agen2.content
         })
 
-        # 4. AGEN 3: BotRadar & OSINT Specialist
+        # 4. UNIT 03: NEXUS TOPOLOGY (Cluster Graph & Hub Hunter)
         hasil_tool_bot = baca_dan_analisis_botnet.invoke({})
         parsed_bot = json.loads(hasil_tool_bot)
 
@@ -73,7 +73,7 @@ class AutonomousCyberOffice:
         hasil_tool_osint = cek_jejak_digital_osint.invoke({"username": target_dalang})
 
         prompt_agen3 = (
-            f"Kamu adalah Agen 3 (Operator BotRadar & Forensik OSINT). "
+            f"Kamu adalah Unit 3 NEXUS TOPOLOGY (Cluster Graph & Hub Hunter). "
             f"Data deteksi botnet:\n{hasil_tool_bot}\n"
             f"Data pelacakan OSINT target dalang {target_dalang}:\n{hasil_tool_osint}\n\n"
             f"Tugasmu: Jelaskan pola 'posting serentak, akun baru' yang ditemukan, "
@@ -81,8 +81,8 @@ class AutonomousCyberOffice:
         )
         resp_agen3 = self.llm.invoke(prompt_agen3)
         log_eksekusi.append({
-            "agent": "Agen 3 - BotRadar & OSINT Specialist",
-            "action": "Investigasi Jaringan & Pelacakan Aktor",
+            "agent": "NEXUS TOPOLOGY (Cluster Graph & Hub Hunter)",
+            "action": "Investigasi Jaringan & Pelacakan Dalang",
             "thought": resp_agen3.content,
             "raw_tool_data": {
                 "flagged_accounts": parsed_bot["flagged_accounts"],
@@ -91,20 +91,20 @@ class AutonomousCyberOffice:
             }
         })
 
-        # 5. AGEN 4: Validator & PoC Reporter
+        # 5. UNIT 04: VERITAS AUDITOR (Digital Forensics & Evidence Seal)
         prompt_agen4 = (
-            f"Kamu adalah Agen 4 (Validator & PoC Reporter). "
+            f"Kamu adalah Unit 4 VERITAS AUDITOR (Digital Forensics & Evidence Seal). "
             f"Evaluasi seluruh laporan intelijen berikut:\n"
-            f"- Temuan Agen 1: {resp_agen1.content}\n"
-            f"- Temuan Agen 2: {resp_agen2.content}\n"
-            f"- Bukti Agen 3: {resp_agen3.content}\n\n"
+            f"- Temuan SIGNAL SCOUT: {resp_agen1.content}\n"
+            f"- Temuan NEURAL REASONER: {resp_agen2.content}\n"
+            f"- Bukti NEXUS TOPOLOGY: {resp_agen3.content}\n\n"
             f"Tugasmu: Berikan kesimpulan final, tetapkan status ancaman (CRITICAL/HIGH/MEDIUM/LOW), "
             f"dan buat rangkuman Proof of Concept (PoC) tervalidasi untuk komando pertahanan."
         )
         resp_agen4 = self.llm.invoke(prompt_agen4)
         log_eksekusi.append({
-            "agent": "Agen 4 - Validator & Forensic Reporter",
-            "action": "Validasi Silang & Finalisasi PoC",
+            "agent": "VERITAS AUDITOR (Digital Forensics & Evidence Seal)",
+            "action": "Validasi Silang & Segel Berkas PoC",
             "thought": resp_agen4.content
         })
 

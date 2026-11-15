@@ -3,7 +3,7 @@ from bot_detector import analisis_jaringan_dan_bot
 
 class AgentEarlyWarning:
     def __init__(self):
-        self.name = "Agen 1 - Early Warning & Anomaly"
+        self.name = "Unit 1 - SIGNAL SCOUT (Velocity & Anomaly)"
 
     def execute(self, state: dict) -> dict:
         total_data = len(state["raw_data"])
@@ -21,7 +21,7 @@ class AgentEarlyWarning:
 
 class AgentHoaxSentiment:
     def __init__(self):
-        self.name = "Agen 2 - Hoax & Sentiment Classifier"
+        self.name = "Unit 2 - NEURAL REASONER (Cognitive & Narrative)"
 
     def execute(self, state: dict) -> dict:
         keywords_hoax = ["rekayasa", "aparat", "jangan percaya", "ditutupi"]
@@ -51,7 +51,7 @@ class AgentHoaxSentiment:
 
 class AgentBotRadarOSINT:
     def __init__(self):
-        self.name = "Agen 3 - BotRadar, SNA & OSINT Hunter"
+        self.name = "Unit 3 - NEXUS TOPOLOGY (Cluster Graph & SNA)"
 
     def execute(self, state: dict) -> dict:
         hasil_sna = analisis_jaringan_dan_bot(state["csv_path"])
@@ -78,7 +78,7 @@ class AgentBotRadarOSINT:
 
 class AgentValidatorReporter:
     def __init__(self):
-        self.name = "Agen 4 - Validator & PoC Reporter"
+        self.name = "Unit 4 - VERITAS AUDITOR (Forensic Evidence Seal)"
 
     def execute(self, state: dict) -> dict:
         bot_count = len(state["agent_3"]["flagged_accounts"])
@@ -113,7 +113,7 @@ class AgentValidatorReporter:
         }
 
 class BossAIOps:
-    """Komandan orkestrator yang mengarahkan alur kerja antar-agen."""
+    """Komandan orkestrator STRATCOM yang mengarahkan alur kerja antar-unit ACTF."""
     def __init__(self):
         self.agen_1 = AgentEarlyWarning()
         self.agen_2 = AgentHoaxSentiment()
@@ -139,7 +139,7 @@ class BossAIOps:
         state["agent_4"] = self.agen_4.execute(state)
 
         return {
-            "boss_ai_status": f"Misi analitik selesai untuk target: {topic}.",
+            "stratcom_status": f"Misi analitik selesai untuk target: {topic}.",
             "topic": topic,
             "threat_level": state["agent_4"]["threat_level"],
             "summary_poc": state["agent_4"]["poc_summary"],
