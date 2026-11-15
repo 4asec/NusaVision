@@ -658,32 +658,7 @@
     </div>
   </main>
 
-  <!-- BOTTOM FLOATING HUD CONTROLS -->
-  <footer class="relative z-20 px-6 py-3 border-t border-white/[0.06] bg-[#06070a]/90 backdrop-blur-md flex items-center justify-between">
-    <div class="flex items-center gap-2">
-      <button onclick="prevSlide()" class="px-3.5 py-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 border border-white/10 text-neutral-300 hover:text-white transition flex items-center gap-1.5 text-xs font-bold">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
-        <span>Sebelumnya (←)</span>
-      </button>
-      <button onclick="nextSlide()" class="px-4 py-1.5 rounded-lg bg-red-950 hover:bg-red-900 border border-red-800 text-red-200 hover:text-white transition flex items-center gap-1.5 text-xs font-bold glow-red-sm">
-        <span>Berikutnya (→)</span>
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
-      </button>
-    </div>
 
-    <!-- Center Keyboard Hint -->
-    <div class="hidden sm:flex items-center gap-2 text-[11px] text-neutral-400 font-mono-tech">
-      <span class="px-2 py-0.5 rounded bg-neutral-900 border border-white/10">Space</span> / <span class="px-2 py-0.5 rounded bg-neutral-900 border border-white/10">Arrow Keys</span> untuk Navigasi
-    </div>
-
-    <!-- Right Controls -->
-    <div class="flex items-center gap-2">
-      <a href="/" target="_blank" class="px-3 py-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 border border-white/10 text-neutral-300 hover:text-white transition text-xs font-medium flex items-center gap-1.5">
-        <span>Buka Purwarupa</span>
-        <svg class="w-3.5 h-3.5 text-neutral-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>
-      </a>
-    </div>
-  </footer>
 
   <!-- SPEAKER NOTES SLIDE-OVER DRAWER -->
   <aside id="speakerNotesDrawer" class="fixed top-0 right-0 w-96 max-w-full h-full bg-[#08090f]/95 border-l border-white/10 backdrop-blur-xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col justify-between p-6 shadow-2xl">
@@ -893,6 +868,17 @@
 
     // Init
     document.addEventListener("DOMContentLoaded", () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const slideParam = parseInt(urlParams.get("slide"));
+      if (slideParam && slideParam >= 1 && slideParam <= totalSlides) {
+        currentSlide = slideParam;
+      }
+      if (urlParams.get("pdf") === "1") {
+        const btnNotes = document.getElementById("btnToggleNotes");
+        if (btnNotes) btnNotes.style.display = "none";
+        const btnFs = btnNotes ? btnNotes.nextElementSibling : null;
+        if (btnFs) btnFs.style.display = "none";
+      }
       updateSlideView();
     });
   </script>
