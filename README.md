@@ -1,11 +1,49 @@
 <p align="center">
+  <a href="https://github.com/4asec/NusaVision">
+    <img src="submission_assets/thumbnail_nusavision_1200x630.png" alt="NusaVision - Cognitive Domain Defense Radar" width="100%">
+  </a>
+</p>
+
+<p align="center">
   <img src="backend/assets/logo-full.svg" alt="NusaVision Cognitive Domain Radar" width="460">
+</p>
+
+<p align="center">
+  <strong>Platform Intelijen Siber Sosial & Analisis Opini Publik Berbasis Hierarki Multi-Agent AI (ACTF) & DeepSeek-R1</strong>
+</p>
+
+<p align="center">
+  <a href="https://github.com/4asec/NusaVision"><img src="https://img.shields.io/badge/Kartika%20Cyber%20Hackathon-2026-e10600?style=for-the-badge&logo=shield&logoColor=white" alt="Hackathon"></a>
+  <a href="https://github.com/4asec/NusaVision"><img src="https://img.shields.io/badge/Kategori-Siber%20Sosial-11111b?style=for-the-badge&logo=target&logoColor=ff2a2a" alt="Category"></a>
+  <a href="https://github.com/4asec/NusaVision"><img src="https://img.shields.io/badge/Penyelenggara-PUSSIBERAD%20%C3%97%20CODEPOLITAN-004d20?style=for-the-badge" alt="Host"></a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/4asec/NusaVision"><img src="https://img.shields.io/badge/Multi--Agent-ACTF%20(5%20Tactical%20Agents)-ff2a2a?style=for-the-badge&logo=probot&logoColor=white" alt="Multi-Agent"></a>
+  <a href="https://github.com/deepseek-ai"><img src="https://img.shields.io/badge/Reasoning%20Engine-DeepSeek--R1%20Local-1e1e2e?style=for-the-badge&logo=deepnote&logoColor=white" alt="DeepSeek"></a>
+  <a href="https://github.com/4asec/NusaVision"><img src="https://img.shields.io/badge/Data%20Sovereignty-Zero%20Cloud%20Leakage-00c853?style=for-the-badge&logo=security&logoColor=white" alt="Sovereignty"></a>
+</p>
+
+<p align="center">
+  <a href="https://www.python.org"><img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"></a>
+  <a href="https://fastapi.tiangolo.com"><img src="https://img.shields.io/badge/Backend-FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI"></a>
+  <a href="https://d3js.org"><img src="https://img.shields.io/badge/Graph-D3.js%20v7-F9A03C?style=for-the-badge&logo=d3.js&logoColor=white" alt="D3"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-007ACC?style=for-the-badge" alt="License"></a>
+</p>
+
+<p align="center">
+  <a href="#-ringkasan-eksekutif">Ringkasan</a> •
+  <a href="#-5-pilar-pertahanan-cognitive-domain">5 Pilar</a> •
+  <a href="#-hierarki-autonomous-cognitive-task-force-actf">Satgas ACTF</a> •
+  <a href="#-galeri-antarmuka-purwarupa">Galeri Antarmuka</a> •
+  <a href="#-spesifikasi-antarmuka-api-rest--sse">API Docs</a> •
+  <a href="#-panduan-instalasi--menjalankan-sistem">Instalasi</a>
 </p>
 
 # 🛡️ NusaVision — Cognitive Domain Radar
 ### Platform Intelijen Siber Sosial & Analisis Opini Publik Berbasis Multi-Agent AI
 **Kategori:** Siber Sosial (Social Cyber Defense)  
-**Kompetisi:** Kartika Cyber Hackathon 2026  
+**Kompetisi:** Kartika Cyber Hackathon 2026 (PUSSIBERAD TNI AD × CODEPOLITAN)  
 **Status:** Production Ready • v1.1.0  
 
 > **Emblem Filosofi:** Monogram **NV** berkepala elang dengan paruh melengkung tajam (`#E10600` Crimson Red & `#FFFFFF`) melambangkan kecepatan jelajah sensor kognitif, ketajaman identifikasi jaringan buzzer/botnet, dan keunggulan taktis intelijen siber pertahanan nasional.
@@ -45,6 +83,25 @@ Platform ini mengintegrasikan **Hierarchical Multi-Agent AI System** dengan *Loc
    Visualisasi graf terarah *force-directed* (D3.js v7) yang memetakan hubungan multi-hop antar entitas/akun, menghitung derajat sentralitas (betweenness & degree centrality), serta mengunci simpul dalang utama (*coordinator hub*).
 5. **Early Warning Radar Isu Viral Lintas Platform**  
    Deteksi lonjakan volume percakapan per detik untuk memilah apakah anomali bersifat organik (*Natural Variation*) atau serangan rekayasa opini (*Deliberate Orchestrated Surge*).
+
+---
+
+## 📸 Galeri Antarmuka Purwarupa
+
+Tangkapan layar operasional antarmuka *Command Center* NusaVision:
+
+| 01. Tactical Command Center Radar | 02. Sentiment & Early Warning Matrix |
+| :---: | :---: |
+| <img src="submission_assets/screenshots/01_hero_radar_tactical_command.png" width="100%"> | <img src="submission_assets/screenshots/02_sentiment_early_warning_matrix.png" width="100%"> |
+
+| 03. SNA Force-Directed Graph & Buzzer Profiling | 04. Satgas Multi-Agent ACTF Stream |
+| :---: | :---: |
+| <img src="submission_assets/screenshots/03_dense_sna_force_directed_graph.png" width="100%"> | <img src="submission_assets/screenshots/04_actf_autonomous_cognitive_task_force.png" width="100%"> |
+
+<p align="center">
+  <b>05. Dual-Mode Hoax Classifier & RAG Forensic Document Verification</b><br>
+  <img src="submission_assets/screenshots/05_hoax_classifier_rag_forensic.png" alt="Hoax Classifier" width="96%">
+</p>
 
 ---
 
